@@ -1,5 +1,8 @@
 const express = require("express");
 const userRoutes = require("./routes/userRoutes");
+const supplierRoutes = require("./routes/supplierRoutes");
+const branchRoutes = require("./routes/branchRoutes");
+const categoryRoutes = require("./routes/categoryRoutes");
 
 
 const cors = require("cors");
@@ -14,9 +17,9 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
 app.use("/api/users", userRoutes);
-
-
-
+app.use("/api/supplier", supplierRoutes);
+app.use("/api/branch", branchRoutes);
+app.use("/api/category", categoryRoutes);
 
 app.use(ErrorHandler);
 
