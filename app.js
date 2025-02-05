@@ -13,9 +13,15 @@ app.use("/uploads", express.static(path.join(__dirname, "uploads")));
 // routes
 const routes = [
   { path: "/api/users", route: require("./modules/Users/Users.route") },
-  { path: "/api/supplier", route: require("./modules/Supplier/Supplier.route") },
+  {
+    path: "/api/supplier",
+    route: require("./modules/Supplier/Supplier.route"),
+  },
   { path: "/api/branch", route: require("./modules/Branch/Branch.route") },
-  { path: "/api/category", route: require("./modules/Category/Category.route") },
+  {
+    path: "/api/category",
+    route: require("./modules/Category/Category.route"),
+  },
   { path: "/api/toromba", route: require("./modules/Toromba/Toromba.route") },
 ];
 
