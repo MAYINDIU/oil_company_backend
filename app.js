@@ -3,6 +3,7 @@ const userRoutes = require("./routes/userRoutes");
 const supplierRoutes = require("./routes/supplierRoutes");
 const branchRoutes = require("./routes/branchRoutes");
 const categoryRoutes = require("./routes/categoryRoutes");
+const torombaRoutes = require("./routes/torombaRoutes");
 
 
 const cors = require("cors");
@@ -20,6 +21,9 @@ app.use("/api/users", userRoutes);
 app.use("/api/supplier", supplierRoutes);
 app.use("/api/branch", branchRoutes);
 app.use("/api/category", categoryRoutes);
+app.use("/api/toromba", torombaRoutes);
+
+
 
 app.use(ErrorHandler);
 
