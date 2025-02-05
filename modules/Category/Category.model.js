@@ -1,6 +1,4 @@
-// suplier.js
-const db = require("../config/db");
-const dotenv = require("dotenv");
+const db = require("../../config/db.js");
 
 function getAllCategory(callback) {
   db.query("SELECT * FROM fuel_type ", (err, results) => {
