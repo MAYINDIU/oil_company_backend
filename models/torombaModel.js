@@ -28,7 +28,7 @@ function getAllToromba(callback) {
 
 
 
-function getSingleStationwiseToromba(station_id, callback) {
+function getSingleStationwiseToromba(station_id, fuel_type, callback) {
     const query = `
         SELECT 
             t.toromba_id,
@@ -42,9 +42,9 @@ function getSingleStationwiseToromba(station_id, callback) {
             b.branch_name
         FROM toromba t
         LEFT JOIN branch b ON t.station_id = b.branch_id
-        WHERE t.station_id = ?`; // Using ? as a placeholder
+        WHERE t.station_id = ? AND t.fuel_type = ?`; // Adding fuel_type filter
 
-    db.query(query, [station_id], (err, results) => {
+    db.query(query, [station_id, fuel_type], (err, results) => {
         if (err) {
             console.error("Error fetching toromba data:", err);
             return callback(err, null);
@@ -52,6 +52,7 @@ function getSingleStationwiseToromba(station_id, callback) {
         callback(null, results);
     });
 }
+
 
 
 

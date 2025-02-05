@@ -60,21 +60,21 @@ const createToromba = async (req, res) => {
 
 
 
-const getSingleStationwiseToromba = (req, res) => {
-    const { station_id } = req.params; // Get station_id from URL params
+  const getSingleStationwiseToromba = (req, res) => {
+    const { station_id, fuel_type } = req.query; // Get parameters from query string
 
-    if (!station_id) {
-        return res.status(400).json({ error: "Station ID is required" });
+    if (!station_id || !fuel_type) {
+        return res.status(400).json({ error: "Both station_id and fuel_type are required" });
     }
 
-    torombaModel.getSingleStationwiseToromba(station_id, (err, results) => {
+    torombaModel.getSingleStationwiseToromba(station_id, fuel_type, (err, results) => {
         if (err) {
             console.error("Error fetching toromba data:", err);
             return res.status(500).json({ error: "Internal Server Error" });
         }
 
         if (results.length === 0) {
-            return res.status(404).json({ message: "No toromba records found for this station" });
+            return res.status(404).json({ message: "No toromba records found for this station and fuel type" });
         }
 
         res.status(200).json(results);
