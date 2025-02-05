@@ -58,6 +58,33 @@ const createToromba = async (req, res) => {
   }
 
 
+
+
+const getSingleStationwiseToromba = (req, res) => {
+    const { station_id } = req.params; // Get station_id from URL params
+
+    if (!station_id) {
+        return res.status(400).json({ error: "Station ID is required" });
+    }
+
+    torombaModel.getSingleStationwiseToromba(station_id, (err, results) => {
+        if (err) {
+            console.error("Error fetching toromba data:", err);
+            return res.status(500).json({ error: "Internal Server Error" });
+        }
+
+        if (results.length === 0) {
+            return res.status(404).json({ message: "No toromba records found for this station" });
+        }
+
+        res.status(200).json(results);
+    });
+};
+
+
+
+
+
   const updateToromba= async (req, res) => {
     const { toromba_id } = req.params;
 
@@ -84,6 +111,7 @@ const createToromba = async (req, res) => {
   module.exports = {
         createToromba,
         getAllToromba,
-        updateToromba
+        updateToromba,
+        getSingleStationwiseToromba
   };
   
