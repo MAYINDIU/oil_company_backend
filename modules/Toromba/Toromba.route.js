@@ -1,6 +1,6 @@
 const express = require("express");
-const torombaController = require("../controllers/torombaController");
-const verifyToken = require('../utilities/verifyToken');
+const torombaController = require("./Toromba.controller");
+const verifyToken = require('../../utilities/verifyToken');
 const router = express.Router();
 
 // Prefix all routes with '/api'

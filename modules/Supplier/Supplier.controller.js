@@ -1,17 +1,6 @@
-const ApiError = require("../errors/APIError");
-const supplierModel = require("../models/supplierModel.js");
-const db = require("../config/index.js");
-const sendResponse = require("../utilities/sendResponse");
-const jwt = require("jsonwebtoken");
-const bcrypt = require("bcryptjs");
-const {
-  passwordHash,
-  passwordVerify,
-} = require("../utilities/passwordEncryption");
-const generateJWT = require("../utilities/generateJWT");
-const config = require("../config/index.js");
-const catchAsync = require("../utilities/catchAsync");
-const { JWT_SECRET } = process.env;
+const ApiError = require("../../errors/APIError");
+const supplierModel = require("./Supplier.model.js");
+const sendResponse = require("../../utilities/sendResponse");
 
 const createSupplier = async (req, res) => {
   try {
