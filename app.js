@@ -17,6 +17,7 @@ const routes = [
   { path: "/api/branch", route: require("./modules/Branch/Branch.route") },
   { path: "/api/category", route: require("./modules/Category/Category.route") },
   { path: "/api/toromba", route: require("./modules/Toromba/Toromba.route") },
+  { path: "/api/mdetail", route: require("./modules/MasterDetail/MasterDetail.route") },
 ];
 
 routes.forEach(({ path, route }) => app.use(path, route));
