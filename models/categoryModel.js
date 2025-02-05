@@ -1,6 +1,6 @@
 
 // suplier.js
-const db = require("../config/db");
+const db = require("../config/index.js");
 const dotenv = require("dotenv");
 
 function getAllCategory(callback) {

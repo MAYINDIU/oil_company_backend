@@ -1,6 +1,6 @@
 const ApiError = require("../errors/APIError");
 const branchModel = require("../models/branchModel.js");
-const db = require("../config/db");
+const db = require("../config/index.js");
 const sendResponse = require("../utilities/sendResponse");
     
     

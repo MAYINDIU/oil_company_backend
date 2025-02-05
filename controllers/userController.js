@@ -1,6 +1,6 @@
 const ApiError = require("../errors/APIError");
 const userModel = require("../models/userModel");
-const db = require("../config/db");
+const db = require("../config/index.js");
 const sendResponse = require("../utilities/sendResponse");
 const jwt = require('jsonwebtoken');
 const bcrypt = require("bcryptjs");

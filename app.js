@@ -24,7 +24,7 @@ app.use("/api/category", categoryRoutes);
 app.use(ErrorHandler);
 
 app.listen(port, () => {
-  console.log(` \n- Date ${new Date()}\n`);
+  // console.log(` \n- Date ${new Date()}\n`);
   console.log(`Wow!!Server is running at http://localhost:${port}`);
 });
 

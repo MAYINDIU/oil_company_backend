@@ -1,6 +1,6 @@
 const ApiError = require("../errors/APIError");
 const categoryModel = require("../models/categoryModel");
-const db = require("../config/db");
+const db = require("../config/index.js");
 const sendResponse = require("../utilities/sendResponse");
     
     
