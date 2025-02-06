@@ -12,15 +12,15 @@ const createOrUpdateMasterData = (req, res) => {
     sale_unit,
   } = req.body;
 
-  if (
-    !station_id ||
-    !fuel_type ||
-    !torambo_no ||
-    !present_reading ||
-    !sale_unit
-  ) {
-    return res.status(400).json({ error: "Missing required fields" });
-  }
+  // if (
+  //   !station_id ||
+  //   !fuel_type ||
+  //   !torambo_no ||
+  //   !present_reading ||
+  //   !sale_unit
+  // ) {
+  //   return res.status(400).json({ error: "Missing required fields" });
+  // }
 
   // Step 1: Check if the record exists
   masterModel.findByStationFuelTorambo(
@@ -38,8 +38,7 @@ const createOrUpdateMasterData = (req, res) => {
         const previous_sale_unit_db = results[0]?.sale_unit;
 
         // Step 2: Calculate sale_unit and updated previous_reading
-        const sale_unit_calculated =
-          present_reading - previous_reading_db + previous_sale_unit_db;
+        const sale_unit_calculated = present_reading - previous_reading_db;
         const updatedPreviousReading =
           previous_reading_db + sale_unit_calculated;
 
@@ -171,9 +170,34 @@ const getFueltypeMdetail = (req, res) => {
   });
 };
 
+const getPreviousReadings = (req, res) => {
+  const { station_id, fuel_type, torambo_no } = req.query; // Get parameters from query string
+
+  masterModel.getPreviousReading(
+    station_id,
+    fuel_type,
+    torambo_no,
+    (err, results) => {
+      if (err) {
+        console.error("Error fetching previous reading data:", err);
+        return res.status(500).json({ error: "Internal Server Error" });
+      }
+
+      if (results?.length === 0) {
+        return res
+          .status(201)
+          .json({ message: "No previous reading  found today" });
+      }
+
+      res.status(200).json(results);
+    }
+  );
+};
+
 module.exports = {
   createMasterDetail,
   getSingleMdetail,
   createOrUpdateMasterData,
   getFueltypeMdetail,
+  getPreviousReadings,
 };

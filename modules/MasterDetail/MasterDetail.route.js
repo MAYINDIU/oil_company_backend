@@ -9,4 +9,6 @@ router.get("/master-details", mdetilController.getSingleMdetail);
 router.get("/fueltype-details", mdetilController.getFueltypeMdetail);
 router.post("/update-reading", mdetilController.createOrUpdateMasterData);
 
+router.get("/previous-reading-get", mdetilController.getPreviousReadings);
+
 module.exports = router;

@@ -13,7 +13,7 @@ function getAllToromba(callback) {
             t.updated_date,
             b.branch_name
         FROM toromba t
-        LEFT JOIN branch b ON t.station_id = b.branch_id `;
+        LEFT JOIN branch b ON t.station_id = b.branch_id order by t.torombo_no asc`;
 
   db.query(query, (err, results) => {
     if (err) {
