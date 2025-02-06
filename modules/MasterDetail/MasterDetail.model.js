@@ -53,6 +53,7 @@ const insertMasterData = (mDetail, callback) => {
   db.query(query, mDetail, callback);
 };
 
+//  master details entry
 function createMasterData(mDetail, callback) {
   db.query("INSERT INTO m_detail  SET ?", mDetail, (err, results) => {
     if (err) {
@@ -67,15 +68,14 @@ function createMasterData(mDetail, callback) {
 
 const getFilteredMDetail = (station_id, fuel_type, torambo_no, callback) => {
   const query = `
-      SELECT md.*, b.branch_name 
-      FROM m_detail md
-      LEFT JOIN branch b ON md.station_id = b.branch_id
-      WHERE md.station_id = ? 
-        AND md.fuel_type = ? 
-        AND md.torambo_no = ?
-        AND DATE(md.date) = CURDATE()
-      ORDER BY md.date DESC
-  `;
+     SELECT md.*, b.branch_name 
+FROM m_detail md
+LEFT JOIN branch b ON md.station_id = b.branch_id
+WHERE md.station_id = ? 
+  AND md.fuel_type = ? 
+  AND md.torambo_no = ?
+  AND DATE(md.date) = CURDATE()
+ORDER BY md.torambo_no ASC, md.date ASC `;
 
   db.query(query, [station_id, fuel_type, torambo_no], (err, results) => {
     if (err) {
@@ -94,10 +94,22 @@ const getFueltypeMDetail = (station_id, fuel_type, callback) => {
       WHERE md.station_id = ? 
         AND md.fuel_type = ? 
         AND DATE(md.date) = CURDATE()
-      ORDER BY md.date DESC
+      ORDER BY md.date ASC,md.torambo_no ASC
   `;
 
   db.query(query, [station_id, fuel_type], (err, results) => {
+    if (err) {
+      console.error("Error fetching m_detail data:", err);
+      return callback(err, null);
+    }
+    callback(null, results);
+  });
+};
+
+const getPreviousReading = (station_id, fuel_type, torambo_no, callback) => {
+  const query = `SELECT * FROM update_reading WHERE station_id = ? AND fuel_type = ? AND torambo_no = ?`;
+
+  db.query(query, [station_id, fuel_type, torambo_no], (err, results) => {
     if (err) {
       console.error("Error fetching m_detail data:", err);
       return callback(err, null);
@@ -113,4 +125,5 @@ module.exports = {
   updateMasterData,
   insertMasterData,
   getFueltypeMDetail,
+  getPreviousReading,
 };
