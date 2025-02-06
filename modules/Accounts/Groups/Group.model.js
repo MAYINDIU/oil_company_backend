@@ -12,7 +12,7 @@ exports.create = (newUser, callback) => {
 };
 
 exports.getAll = (callback) => {
-  const sql = "SELECT * FROM acc_groups";
+  const sql = "SELECT * FROM acc_groups ORDER BY nature";
   connection.query(sql, (err, results) => {
     if (err) {
       callback(err, null);
