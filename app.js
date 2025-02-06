@@ -23,7 +23,22 @@ const routes = [
     route: require("./modules/Category/Category.route"),
   },
   { path: "/api/toromba", route: require("./modules/Toromba/Toromba.route") },
-  { path: "/api/mdetail", route: require("./modules/MasterDetail/MasterDetail.route") },
+  {
+    path: "/api/mdetail",
+    route: require("./modules/MasterDetail/MasterDetail.route"),
+  },
+  {
+    path: "/api/rate",
+    route: require("./modules/Purchases/Purchase.route"),
+  },
+
+  // Accounts Module Part
+  { path: "/api", route: require("./modules/Accounts/Groups/Group.route") },
+  {
+    path: "/api",
+    route: require("./modules/Accounts/SubGroups/SubGroup.route"),
+  },
+  { path: "/api", route: require("./modules/Accounts/Ledger/Ledger.rotue") },
 ];
 
 routes.forEach(({ path, route }) => app.use(path, route));
