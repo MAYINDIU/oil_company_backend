@@ -39,6 +39,14 @@ const routes = [
     route: require("./modules/Accounts/SubGroups/SubGroup.route"),
   },
   { path: "/api", route: require("./modules/Accounts/Ledger/Ledger.rotue") },
+  {
+    path: "/api/expense-item",
+    route: require("./modules/ExpenseItem/ExpenseItem.route"),
+  },
+  {
+    path: "/api/expense-amount",
+    route: require("./modules/StationExpense/StationExpense.route"),
+  },
 ];
 
 routes.forEach(({ path, route }) => app.use(path, route));
