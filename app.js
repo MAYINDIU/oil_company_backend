@@ -13,11 +13,25 @@ app.use("/uploads", express.static(path.join(__dirname, "uploads")));
 // routes
 const routes = [
   { path: "/api/users", route: require("./modules/Users/Users.route") },
-  { path: "/api/supplier", route: require("./modules/Supplier/Supplier.route") },
+  {
+    path: "/api/supplier",
+    route: require("./modules/Supplier/Supplier.route"),
+  },
   { path: "/api/branch", route: require("./modules/Branch/Branch.route") },
-  { path: "/api/category", route: require("./modules/Category/Category.route") },
+  {
+    path: "/api/category",
+    route: require("./modules/Category/Category.route"),
+  },
   { path: "/api/toromba", route: require("./modules/Toromba/Toromba.route") },
-  { path: "/api/mdetail", route: require("./modules/MasterDetail/MasterDetail.route") },
+  {
+    path: "/api/mdetail",
+    route: require("./modules/MasterDetail/MasterDetail.route"),
+  },
+
+  // Accounts Module Part
+  { path: "/api", route: require("./modules/Accounts/Groups/Group.route") },
+  { path: "/api", route: require("./modules/Accounts/SubGroups/SubGroup.route") },
+  { path: "/api", route: require("./modules/Accounts/Ledger/Ledger.rotue") },
 ];
 
 routes.forEach(({ path, route }) => app.use(path, route));
