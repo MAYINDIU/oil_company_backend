@@ -1,7 +1,6 @@
-const ApiError = require("../errors/APIError");
-const torombaModel = require("../models/torombaModel");
-const db = require("../config/db");
-const sendResponse = require("../utilities/sendResponse");
+const ApiError = require("../../errors/APIError");
+const torombaModel = require("./Toromba.model");
+const sendResponse = require("../../utilities/sendResponse");
 
 const createToromba = async (req, res) => {
   try {

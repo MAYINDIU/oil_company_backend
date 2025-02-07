@@ -1,21 +1,16 @@
-const ApiError = require("../errors/APIError");
-const userModel = require("../models/userModel");
-const db = require("../config/db");
-const sendResponse = require("../utilities/sendResponse");
-const jwt = require('jsonwebtoken');
+const ApiError = require("../../errors/APIError");
+const userModel = require("./Users.model.js");
+const db = require("../../config/db.js");
+const sendResponse = require("../../utilities/sendResponse");
+const jwt = require("jsonwebtoken");
 const bcrypt = require("bcryptjs");
 const {
   passwordHash,
   passwordVerify,
-} = require("../utilities/passwordEncryption");
-const generateJWT = require("../utilities/generateJWT");
-const config = require("../config/index.js");
-const catchAsync = require("../utilities/catchAsync");
-const {JWT_SECRET}=process.env;
-
-
-
-
+} = require("../../utilities/passwordEncryption");
+const config = require("../../config/db.js");
+const catchAsync = require("../../utilities/catchAsync");
+const { JWT_SECRET } = process.env;
 
 function getAllUsers(req, res) {
   userModel.getAllUsers((err, users) => {
@@ -32,23 +27,15 @@ function getAllUsers(req, res) {
   });
 }
 
-
-
 const register = async (req, res) => {
   try {
     const body = req.body;
-    // console.log(body);
 
     const { password } = body;
-    // Generate a salt and hash the password
-    const saltRounds=config.bcrypt_salt_rounds;
-    // console.log(saltRounds)
+    const saltRounds = config.bcrypt_salt_rounds;
     const hashPassword = await bcrypt.hash(password, Number(saltRounds));
-  
 
     const saveData = { ...body, password: hashPassword };
-    
-
 
     // Save the user data to the database
     userModel.createUser(saveData, (err, result) => {
@@ -66,8 +53,6 @@ const register = async (req, res) => {
     res.status(500).json({ error: error.message });
   }
 };
-
-
 
 const updateUser = async (req, res) => {
   const { id } = req.params;
@@ -90,7 +75,7 @@ const updateUser = async (req, res) => {
 
 const getSingleUser = async (req, res) => {
   const { id } = req.params;
-  userModel.getUser(id, (err, user) => {
+  userModel.getUserById(id, (err, user) => {
     if (err) {
       throw new ApiError(500, err.message);
     } else {
@@ -104,61 +89,58 @@ const getSingleUser = async (req, res) => {
   });
 };
 
-
-
-
 const login = (req, res) => {
   const { email, password } = req.body; // Use 'email' instead of 'employee_id'
 
-console.log(email,password)
-
   if (!email || !password) {
-    return res.status(400).json({ error: 'Email and password are required' });
+    return res.status(400).json({ error: "Email and password are required" });
   }
 
   userModel.getUserByEmail(email, (error, user) => {
     if (error) {
-      console.error('Error fetching user:', error);
-      return res.status(500).json({ error: 'Internal server error' });
+      console.error("Error fetching user:", error);
+      return res.status(500).json({ error: "Internal server error" });
     }
 
-
     if (!user) {
-      return res.status(401).json({ error: 'Invalid email or password' });
+      return res.status(401).json({ error: "Invalid email or password" });
     }
 
     bcrypt.compare(password, user.password, (err, result) => {
       if (err) {
-        console.error('Error comparing passwords:', err);
-        return res.status(500).json({ error: 'Internal server error' });
+        console.error("Error comparing passwords:", err);
+        return res.status(500).json({ error: "Internal server error" });
       }
 
       if (!result) {
-        return res.status(401).json({ error: 'Invalid email or password' });
+        return res.status(401).json({ error: "Invalid email or password" });
       }
 
       // Generate JWT Token
-      const token = jwt.sign({ id: user.id }, JWT_SECRET, { expiresIn: '1h' });
+      const token = jwt.sign({ id: user.id }, JWT_SECRET, { expiresIn: "1h" });
 
       // Update last login time
-      db.query(`UPDATE users SET last_login = NOW() WHERE id = ?`, [user.id], (updateErr) => {
-        if (updateErr) {
-          console.error('Error updating last login time:', updateErr);
+      db.query(
+        `UPDATE users SET last_login = NOW() WHERE id = ?`,
+        [user.id],
+        (updateErr) => {
+          if (updateErr) {
+            console.error("Error updating last login time:", updateErr);
+          }
         }
-      });
+      );
 
-      return res.status(200).json({ message: 'Login successful', token, user });
+      return res.status(200).json({ message: "Login successful", token, user });
     });
   });
 };
-
 
 const userCheckPassword = catchAsync(async (req, res) => {
   const { ...data } = req.body;
   const { id } = req.params;
   const { password } = data;
 
-  userModel.getUser(id, async (err, user) => {
+  userModel.getUserById(id, async (err, user) => {
     if (err) throw new ApiError(500, err.message);
     else {
       if (user) {
@@ -214,5 +196,5 @@ module.exports = {
   updateUser,
   userCheckPassword,
   changePassword,
-  login
+  login,
 };
