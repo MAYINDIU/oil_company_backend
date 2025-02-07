@@ -32,13 +32,16 @@ const routes = [
     route: require("./modules/Purchases/Purchase.route"),
   },
 
-  // Accounts Module Part
+  // Accounts Module Part start
   { path: "/api", route: require("./modules/Accounts/Groups/Group.route") },
   {
     path: "/api",
     route: require("./modules/Accounts/SubGroups/SubGroup.route"),
   },
   { path: "/api", route: require("./modules/Accounts/Ledger/Ledger.rotue") },
+  { path: "/api", route: require("./modules/Accounts/Vouchers/Voucher.route") },
+  // Accounts Module Part end
+
   {
     path: "/api/expense-item",
     route: require("./modules/ExpenseItem/ExpenseItem.route"),
