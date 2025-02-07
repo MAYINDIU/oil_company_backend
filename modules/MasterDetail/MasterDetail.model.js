@@ -86,18 +86,38 @@ ORDER BY md.torambo_no ASC, md.date ASC `;
   });
 };
 
-const getFueltypeMDetail = (station_id, fuel_type, callback) => {
+// const getFueltypeMDetail = (station_id, fuel_type, callback) => {
+//   const query = `
+//       SELECT md.*, b.branch_name
+//       FROM m_detail md
+//       LEFT JOIN branch b ON md.station_id = b.branch_id
+//       WHERE md.station_id = ?
+//         AND md.fuel_type = ?
+//         AND DATE(md.date) = CURDATE()
+//       ORDER BY md.date ASC,md.torambo_no ASC
+//   `;
+
+//   db.query(query, [station_id, fuel_type], (err, results) => {
+//     if (err) {
+//       console.error("Error fetching m_detail data:", err);
+//       return callback(err, null);
+//     }
+//     callback(null, results);
+//   });
+// };
+
+const getFueltypeMDetail = (station_id, fuel_type, c_date, callback) => {
   const query = `
       SELECT md.*, b.branch_name 
       FROM m_detail md
       LEFT JOIN branch b ON md.station_id = b.branch_id
       WHERE md.station_id = ? 
         AND md.fuel_type = ? 
-        AND DATE(md.date) = CURDATE()
-      ORDER BY md.date ASC,md.torambo_no ASC
+        AND DATE(md.date) = ?  -- Replaced CURDATE() with the filter_date placeholder
+      ORDER BY md.date ASC, md.torambo_no ASC
   `;
 
-  db.query(query, [station_id, fuel_type], (err, results) => {
+  db.query(query, [station_id, fuel_type, c_date], (err, results) => {
     if (err) {
       console.error("Error fetching m_detail data:", err);
       return callback(err, null);

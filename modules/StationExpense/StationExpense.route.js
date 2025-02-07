@@ -11,4 +11,9 @@ router.get(
   stationController.getStationExpenseByStationId
 );
 
+router.get(
+  "/total-expense/:station_id",
+  stationController.getTotalExpensebystation
+);
+
 module.exports = router;
