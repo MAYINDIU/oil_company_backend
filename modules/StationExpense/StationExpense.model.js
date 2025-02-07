@@ -1,5 +1,26 @@
 const db = require("../../config/db.js");
 
+const getTotalExpenseByStation = (station_id, callback) => {
+  const query = `
+    SELECT 
+        se.station_id, 
+        se.created_date, 
+        ROUND(SUM(se.amount), 0) AS total_expense,
+        b.branch_name
+    FROM station_expense se
+    JOIN branch b ON se.station_id = b.branch_id
+    WHERE se.station_id = ? 
+    AND se.created_date >= CURDATE()`;
+
+  db.query(query, [station_id], (err, result) => {
+    if (err) {
+      console.error("Error fetching total expense:", err);
+      return callback(err, null);
+    }
+    callback(null, result);
+  });
+};
+
 function getAllstationExpensebystationid(station_id, callback) {
   const query = `
     SELECT 
@@ -70,4 +91,5 @@ module.exports = {
   createExpenseamount,
   getAllstationExpense,
   getAllstationExpensebystationid,
+  getTotalExpenseByStation,
 };

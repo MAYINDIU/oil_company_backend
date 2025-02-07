@@ -47,6 +47,10 @@ const routes = [
     path: "/api/expense-amount",
     route: require("./modules/StationExpense/StationExpense.route"),
   },
+  {
+    path: "/api/master-data",
+    route: require("./modules/MasterSummary/MasterSummary.route"),
+  },
 ];
 
 routes.forEach(({ path, route }) => app.use(path, route));
