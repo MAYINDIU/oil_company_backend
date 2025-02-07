@@ -93,9 +93,10 @@ const createMasterDetail = async (req, res) => {
       torambo_no,
       previous_reading,
       present_reading,
-      addition,
       sale_unit,
     } = req.body;
+
+    const addCalculation = (sale_unit * 5) / 100;
 
     // Prepare data for insertion
     const saveData = {
@@ -105,7 +106,7 @@ const createMasterDetail = async (req, res) => {
       previous_reading,
       present_reading,
       sale_unit,
-      addition: addition || 0, // Default addition to 0 if not provided
+      addition: addCalculation || 0, // Default addition to 0 if not provided
     };
 
     // Insert into database
@@ -134,6 +135,7 @@ const getSingleMdetail = (req, res) => {
     station_id,
     fuel_type,
     torambo_no,
+
     (err, results) => {
       if (err) {
         console.error("Error fetching toromba data:", err);
@@ -152,22 +154,28 @@ const getSingleMdetail = (req, res) => {
 };
 
 const getFueltypeMdetail = (req, res) => {
-  const { station_id, fuel_type } = req.query; // Get parameters from query string
+  const { station_id, fuel_type, c_date } = req.query; // Get parameters from query string
 
-  masterModel.getFueltypeMDetail(station_id, fuel_type, (err, results) => {
-    if (err) {
-      console.error("Error fetching toromba data:", err);
-      return res.status(500).json({ error: "Internal Server Error" });
+  masterModel.getFueltypeMDetail(
+    station_id,
+    fuel_type,
+    c_date,
+    (err, results) => {
+      // Added the missing comma here
+      if (err) {
+        console.error("Error fetching toromba data:", err);
+        return res.status(500).json({ error: "Internal Server Error" });
+      }
+
+      if (results.length === 0) {
+        return res
+          .status(201)
+          .json({ message: "No toromba records found for the specified date" });
+      }
+
+      res.status(200).json(results);
     }
-
-    if (results.length === 0) {
-      return res
-        .status(201)
-        .json({ message: "No toromba records found today" });
-    }
-
-    res.status(200).json(results);
-  });
+  );
 };
 
 const getPreviousReadings = (req, res) => {
