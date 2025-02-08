@@ -19,15 +19,27 @@ function getAllPurchaseData(req, res) {
 
 const createPurchaseRate = async (req, res) => {
   try {
-    const { station_id, supplier_id, fuel_type, p_rate, quantity_unit } =
-      req.body;
+    const {
+      station_id,
+      supplier_id,
+      fuel_type,
+      no_truck,
+      total_qty,
+      total_amt,
+    } = req.body;
+
+    // Calculate unit_p_rate based on total_qty and total_amt
+    const unit_p_rate = total_amt / total_qty;
+
     // Prepare data for insertion
     const saveData = {
       station_id,
       supplier_id,
       fuel_type,
-      p_rate,
-      quantity_unit,
+      no_truck,
+      unit_p_rate, // This is now calculated before insertion
+      total_qty,
+      total_amt,
     };
 
     // Insert into database
