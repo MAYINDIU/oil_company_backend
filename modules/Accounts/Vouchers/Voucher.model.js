@@ -55,8 +55,8 @@ const AllJournamModel = {
 
   getByDateRange: (startDate, endDate, callback) => {
     connection.query(
-      `SELECT * FROM acc_vouchers WHERE transaction_date >= ? AND transaction_date <= ? AND 
-      active =1 ORDER BY STR_TO_DATE(transaction_date, '%Y-%m-%d'),voucher_type`,
+      `SELECT * FROM acc_vouchers WHERE vc_date >= ? AND vc_date <= ? AND 
+      is_posted =1 ORDER BY STR_TO_DATE(vc_date, '%Y-%m-%d'),vc_type`,
       [startDate, endDate],
       (err, rows) => {
         if (err) {
@@ -70,8 +70,8 @@ const AllJournamModel = {
 
   getByLedgerDateRange: (ledgerId, startDate, endDate, callback) => {
     const query = `SELECT * FROM acc_vouchers WHERE ledger_id = ? AND 
-      transaction_date >= ? AND transaction_date <= ? AND 
-      active =1 ORDER BY STR_TO_DATE(transaction_date, '%Y-%m-%d')`;
+      vc_date >= ? AND vc_date <= ? AND 
+      active =1 ORDER BY STR_TO_DATE(vc_date, '%Y-%m-%d')`;
     connection.query(query, [ledgerId, startDate, endDate], (err, rows) => {
       if (err) {
         callback(err, null);
@@ -83,8 +83,8 @@ const AllJournamModel = {
 
   partyLedgerModel: (ledgerId, startDate, endDate, callback) => {
     const query = `SELECT * FROM acc_vouchers WHERE ledger_id = ? AND 
-      transaction_date >= ? AND transaction_date <= ? AND 
-      active =1 ORDER BY STR_TO_DATE(transaction_date, '%Y-%m-%d')`;
+      vc_date >= ? AND vc_date <= ? AND 
+      active =1 ORDER BY STR_TO_DATE(vc_date, '%Y-%m-%d')`;
     connection.query(query, [ledgerId, startDate, endDate], (err, rows) => {
       if (err) {
         callback(err, null);
@@ -98,7 +98,7 @@ const AllJournamModel = {
     const query = `
       SELECT COALESCE(SUM(COALESCE(debit, 0)), 0) - COALESCE(SUM(COALESCE(credit, 0)), 0) AS opening_balance
       FROM acc_vouchers
-      WHERE ledger_id = ? AND transaction_date < ? AND active = 1
+      WHERE ledger_id = ? AND vc_date < ? AND active = 1
     `;
     connection.query(query, [ledgerId, startDate], (err, result) => {
       if (err) {
@@ -114,7 +114,7 @@ const AllJournamModel = {
       SELECT COALESCE(SUM(COALESCE(debit, 0)), 0) - COALESCE(SUM(COALESCE(credit, 0)), 0) AS opening_balance
       FROM acc_vouchers
       WHERE (tag_supp = ? OR tag_client = ? OR tag_farmer = ?)
-        AND transaction_date < ? 
+        AND vc_date < ? 
         AND active = 1
     `;
     connection.query(query, [cusId, cusId, cusId, startDate], (err, result) => {
@@ -130,7 +130,7 @@ const AllJournamModel = {
   //   const query = `
   //   SELECT SUM(debit) - SUM(credit) AS opening_balance
   //   FROM acc_vouchers
-  //   WHERE transaction_date < ? AND ledger_id = ? AND active = 1
+  //   WHERE vc_date < ? AND ledger_id = ? AND active = 1
   // `;
   //   connection.query(query, [startDate, ledgerId], (err, result) => {
   //     if (err) {
@@ -143,8 +143,8 @@ const AllJournamModel = {
 
   receivedAndPaymentModel: (startDate, endDate, callback) => {
     connection.query(
-      `SELECT * FROM acc_vouchers WHERE transaction_date >= ? AND transaction_date <= ? AND voucher_type !=1
-       AND active =1 AND post_type !=1 ORDER BY STR_TO_DATE(transaction_date, '%Y-%m-%d')`,
+      `SELECT * FROM acc_vouchers WHERE vc_date >= ? AND vc_date <= ? AND vc_type !=1
+       AND active =1 AND post_type !=1 ORDER BY STR_TO_DATE(vc_date, '%Y-%m-%d')`,
       [startDate, endDate],
       (err, rows) => {
         if (err) {
@@ -158,9 +158,9 @@ const AllJournamModel = {
 
   cashBookModel: (startDate, endDate, ledgerId, callback) => {
     connection.query(
-      `SELECT * FROM acc_vouchers WHERE transaction_date >= ? AND transaction_date <= ? 
-      AND ledger_id = ? AND (voucher_type = 2 OR voucher_type = 4)
-       AND active =1 AND post_type =1 ORDER BY STR_TO_DATE(transaction_date, '%Y-%m-%d')`,
+      `SELECT * FROM acc_vouchers WHERE vc_date >= ? AND vc_date <= ? 
+      AND ledger_id = ? AND (vc_type = 2 OR vc_type = 4)
+       AND active =1 AND post_type =1 ORDER BY STR_TO_DATE(vc_date, '%Y-%m-%d')`,
       [startDate, endDate, ledgerId],
       (err, rows) => {
         if (err) {
@@ -174,9 +174,9 @@ const AllJournamModel = {
 
   bankBookModel: (startDate, endDate, ledgerId, callback) => {
     connection.query(
-      `SELECT * FROM acc_vouchers WHERE transaction_date >= ? AND transaction_date <= ? 
-       AND ledger_id = ? AND (voucher_type = 3 OR voucher_type = 5)
-       AND active =1 AND post_type =1 ORDER BY STR_TO_DATE(transaction_date, '%Y-%m-%d')`,
+      `SELECT * FROM acc_vouchers WHERE vc_date >= ? AND vc_date <= ? 
+       AND ledger_id = ? AND (vc_type = 3 OR vc_type = 5)
+       AND active =1 AND post_type =1 ORDER BY STR_TO_DATE(vc_date, '%Y-%m-%d')`,
       [startDate, endDate, ledgerId],
       (err, rows) => {
         if (err) {
@@ -208,20 +208,20 @@ const AllJournamModel = {
       narration,
       debit,
       credit,
-      transaction_date,
+      vc_date,
       bank_name,
       cheque_date,
       branch_name,
       cheque_no,
     } = update;
     connection.query(
-      "UPDATE acc_vouchers SET ledger_id = ?, narration = ?, debit = ?, credit = ?, transaction_date = ?, bank_name = ?, cheque_date = ?, branch_name = ?, cheque_no = ? WHERE journal_id = ?",
+      "UPDATE acc_vouchers SET ledger_id = ?, narration = ?, debit = ?, credit = ?, vc_date = ?, bank_name = ?, cheque_date = ?, branch_name = ?, cheque_no = ? WHERE journal_id = ?",
       [
         ledger_id,
         narration,
         debit,
         credit,
-        transaction_date,
+        vc_date,
         bank_name,
         cheque_date,
         branch_name,

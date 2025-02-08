@@ -137,10 +137,6 @@ exports.journalByDateRange = async (req, res) => {
   const { startDate, endDate } = req.query;
 
   const allLedger = await ledgerModel.getAllAsync();
-  const allFarmer = await Farmer.getAllAsync();
-  const allClient = await SuppDlr.getAllAsync();
-  // const allSupplier = await Supplier.getAllAsync();
-  // const subHead = await SubSubGroupModal.getAllAsync();
 
   voucherModel.getByDateRange(startDate, endDate, (err, datas) => {
     if (err) {
@@ -149,31 +145,21 @@ exports.journalByDateRange = async (req, res) => {
 
     const data = datas?.map((d) => {
       const findLedger = allLedger?.find((leg) => leg?.id == d?.ledger_id);
-      const findFarmer = allFarmer?.find(
-        (leg) => leg?.farmerId == d?.tag_farmer
-      );
-      const findClient = allClient?.find(
-        (leg) => leg?.suppdlrId == d?.tag_client
-      );
-      const findSupplier = allClient?.find(
-        (leg) => leg?.suppdlrId == d?.tag_supp
-      );
       return {
         ...d,
         ledgerName: findLedger?.ledger_name,
-        farmer: findFarmer?.name,
-        client: findClient?.name,
-        supplier: findSupplier?.name,
         voucherName:
-          d?.voucher_type == "1"
+          d?.vc_type == 1
             ? "JV"
-            : d?.voucher_type == "2"
+            : d?.vc_type == 2
             ? "CP"
-            : d?.voucher_type == "3"
+            : d?.vc_type == 3
             ? "BP"
-            : d?.voucher_type == "4"
+            : d?.vc_type == 4
             ? "CR"
-            : "BR",
+            : d?.vc_type == 5
+            ? "BR"
+            : "",
       };
     });
 
