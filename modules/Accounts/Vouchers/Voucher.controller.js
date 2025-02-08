@@ -16,14 +16,13 @@ voucherModel.getAllAsync = () => {
 exports.createData = async (req, res) => {
   const body = req.body;
 
-  // let sendData;
+  let sendData;
 
-  // if (body?.voucher_type == 1 && body?.credit > 0) {
-  //   sendData = { ...body, post_type: 1 };
-  // } else {
-  //   sendData = { ...body };
-  // }
-  const sendData = { ...body };
+  if (body?.vc_type == 1 && body?.credit > 0) {
+    sendData = { ...body, active: 1 };
+  } else {
+    sendData = { ...body };
+  }
 
   voucherModel.create(sendData, (err, dataId) => {
     if (err) {
