@@ -61,7 +61,28 @@ const createPurchaseRate = async (req, res) => {
   }
 };
 
+const updatePurchase = async (req, res) => {
+  const { id } = req.params;
+
+  const { ...data } = req.body;
+  // console.log(id, data);
+  purchaserateModel.updatePurchase(id, data, (err, user) => {
+    if (err) {
+      // console.log(err);
+      throw new ApiError(500, err.message);
+    } else {
+      sendResponse(res, {
+        statusCode: 200,
+        success: true,
+        message: "Purchase updated successfully",
+        data: user,
+      });
+    }
+  });
+};
+
 module.exports = {
   createPurchaseRate,
   getAllPurchaseData,
+  updatePurchase,
 };

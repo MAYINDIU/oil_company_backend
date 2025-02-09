@@ -97,9 +97,10 @@ const createMasterDetail = async (req, res) => {
       present_reading,
       sale_unit,
       tr_date,
+      rate,
     } = req.body;
 
-    const addCalculation = (sale_unit * 5) / 100;
+    const addCalculation = (sale_unit * rate) / 100;
 
     // Prepare data for insertion
     const saveData = {
