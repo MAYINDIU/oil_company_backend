@@ -54,6 +54,10 @@ const routes = [
     path: "/api/master-data",
     route: require("./modules/MasterSummary/MasterSummary.route"),
   },
+  {
+    path: "/api/report",
+    route: require("./modules/Reports/Reports.route"),
+  },
 ];
 
 routes.forEach(({ path, route }) => app.use(path, route));

@@ -10,6 +10,7 @@ const createToromba = async (req, res) => {
       torombo_no,
       torombo_op_b,
       torombo_close_balance,
+      rate,
     } = req.body;
 
     // Ensure all required fields are present
@@ -23,6 +24,7 @@ const createToromba = async (req, res) => {
       torombo_no,
       torombo_op_b,
       torombo_close_balance,
+      rate,
     };
 
     // Assuming torombaModel.createToromba is a function that accepts saveData and returns a Promise
@@ -108,9 +110,32 @@ const updateToromba = async (req, res) => {
   });
 };
 
+const getToromboRate = (req, res) => {
+  const { station_id, fuel_type, torombo_no } = req.query; // Get parameters from query string
+
+  torombaModel.getToromboRate(
+    station_id,
+    fuel_type,
+    torombo_no,
+    (err, results) => {
+      if (err) {
+        console.error("Error fetching toromba rate:", err);
+        return res.status(500).json({ error: "Internal Server Error" });
+      }
+
+      if (!results || results.length === 0) {
+        return res.status(200).json({ rate: 0 }); // Return rate 0 instead of 404
+      }
+
+      res.status(200).json(results);
+    }
+  );
+};
+
 module.exports = {
   createToromba,
   getAllToromba,
   updateToromba,
   getSingleStationwiseToromba,
+  getToromboRate,
 };
