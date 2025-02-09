@@ -88,8 +88,6 @@ exports.getDataByVcNo = async (req, res) => {
   const { vcno } = req.query;
 
   const allLedger = await ledgerModel.getAllAsync();
-  const allFarmer = await Farmer.getAllAsync();
-  const allClient = await SuppDlr.getAllAsync();
 
   voucherModel.getByVcNo(vcno, (err, data) => {
     if (err) {
@@ -101,31 +99,22 @@ exports.getDataByVcNo = async (req, res) => {
 
     const datas = data?.map((d) => {
       const findLedger = allLedger?.find((leg) => leg?.id == d?.ledger_id);
-      const findFarmer = allFarmer?.find(
-        (leg) => leg?.farmerId == d?.tag_farmer
-      );
-      const findClient = allClient?.find(
-        (leg) => leg?.suppdlrId == d?.tag_client
-      );
-      const findSupplier = allClient?.find(
-        (leg) => leg?.suppdlrId == d?.tag_supp
-      );
+
       return {
         ...d,
         ledgerName: findLedger?.ledger_name,
-        farmer: findFarmer?.name,
-        client: findClient?.name,
-        supplier: findSupplier?.name,
         voucherName:
-          d?.voucher_type == "1"
+          d?.vc_type == 1
             ? "JV"
-            : d?.voucher_type == "2"
+            : d?.vc_type == 2
             ? "CP"
-            : d?.voucher_type == "3"
+            : d?.vc_type == 3
             ? "BP"
-            : d?.voucher_type == "4"
+            : d?.vc_type == 4
             ? "CR"
-            : "BR",
+            : d?.vc_type == 5
+            ? "BR"
+            : "",
       };
     });
 
@@ -326,8 +315,6 @@ exports.receivedAndPaymentController = async (req, res) => {
   const { startDate, endDate } = req.query;
 
   const allLedger = await ledgerModel.getAllAsync();
-  const allFarmer = await Farmer.getAllAsync();
-  const allClient = await SuppDlr.getAllAsync();
 
   voucherModel.receivedAndPaymentModel(startDate, endDate, (err, datas) => {
     if (err) {
@@ -336,30 +323,15 @@ exports.receivedAndPaymentController = async (req, res) => {
 
     const data = datas?.map((d) => {
       const findLedger = allLedger?.find((leg) => leg?.id == d?.ledger_id);
-      const findFarmer = allFarmer?.find(
-        (leg) => leg?.farmerId == d?.tag_farmer
-      );
-      const findClient = allClient?.find(
-        (leg) => leg?.suppdlrId == d?.tag_client
-      );
-      const findSupplier = allClient?.find(
-        (leg) => leg?.suppdlrId == d?.tag_supp
-      );
       return {
-        id: d?.journal_id,
+        id: d?.id,
         vc_no: d?.vc_no,
-        voucher_type: d?.voucher_type,
+        vc_type: d?.vc_type,
         ledger_id: d?.ledger_id,
-        tag_supp: d?.tag_supp,
-        tag_client: d?.tag_client,
-        tag_farmer: d?.tag_farmer,
-        transaction_date: d?.transaction_date,
+        vc_date: d?.vc_date,
         debit: d?.debit,
         credit: d?.credit,
         ledgerName: findLedger?.ledger_name,
-        farmer: findFarmer?.name,
-        client: findClient?.name,
-        supplier: findSupplier?.name,
       };
     });
 
@@ -384,7 +356,7 @@ exports.cashBookController = async (req, res) => {
     }
 
     const data = datas?.map((d) => {
-      const vc = d?.voucher_type;
+      const vc = d?.vc_type;
       function formatDate(dateString) {
         const date = new Date(dateString);
         let day = date.getDate();
@@ -406,7 +378,7 @@ exports.cashBookController = async (req, res) => {
             : vc == 5
             ? "BR"
             : "",
-        date: formatDate(d?.transaction_date),
+        date: formatDate(d?.vc_date),
         debit: d?.debit,
         credit: d?.credit,
         nar: d?.narration,
@@ -425,10 +397,6 @@ exports.bankBookController = async (req, res) => {
     return res.status(400).json({ error: "Missing required parameters" });
   }
 
-  const allLedger = await ledgerModel.getAllAsync().catch((err) => {
-    return res.status(500).json({ error: "Failed to get ledger data" });
-  });
-
   voucherModel.bankBookModel(startDate, endDate, ledgerId, (err, datas) => {
     if (err) {
       return res.status(500).json({ error: "Failed to get data" });
@@ -439,7 +407,7 @@ exports.bankBookController = async (req, res) => {
     }
 
     const data = datas?.map((d) => {
-      const vc = d?.voucher_type;
+      const vc = d?.vc_type;
       function formatDate(dateString) {
         const date = new Date(dateString);
         let day = date.getDate();
@@ -449,10 +417,10 @@ exports.bankBookController = async (req, res) => {
         return getDate;
       }
       return {
-        id: d?.journal_id,
+        id: d?.id,
         vc_no: d?.vc_no,
         vc_type: vc == 2 ? "CP" : vc == 3 ? "BP" : vc == 4 ? "CR" : "BR",
-        date: formatDate(d?.transaction_date),
+        date: formatDate(d?.vc_date),
         debit: d?.debit,
         credit: d?.credit,
         nar: d?.narration,
@@ -490,7 +458,7 @@ exports.updateDataByVoucherNo = (req, res) => {
   const updatePromises = updates?.map((update) => {
     return new Promise((resolve, reject) => {
       voucherModel.updateByVoucherNo(
-        update.journal_id,
+        update.id,
         update,
         (err, affectedRows) => {
           if (err) {
@@ -539,9 +507,9 @@ exports.updatePostedDataByVoucherNo = (req, res) => {
 };
 
 exports.deleteDataByVoucherNo = (req, res) => {
-  const voucherId = req.params.vc_no;
+  const {vc_no} = req.query;
 
-  voucherModel.deleteByVcNo(voucherId, (err, affectedRows) => {
+  voucherModel.deleteByVcNo(vc_no, (err, affectedRows) => {
     if (err) {
       return res.status(500).json({ error: "Failed to delete data" });
     }
