@@ -39,6 +39,7 @@ const routes = [
     route: require("./modules/Accounts/SubGroups/SubGroup.route"),
   },
   { path: "/api", route: require("./modules/Accounts/Ledger/Ledger.rotue") },
+  { path: "/api", route: require("./modules/Accounts/BankApi/BankApi.route") },
   { path: "/api", route: require("./modules/Accounts/Vouchers/Voucher.route") },
   // Accounts Module Part end
 
