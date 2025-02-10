@@ -1,10 +1,10 @@
 const db = require("../../config/db.js");
 
 const getTotalExpenseByStation = (station_id, exp_date, callback) => {
-  const query = `SELECT SUM(amount) AS total_expense
-FROM station_expense 
-WHERE station_id = ?
-AND DATE(created_date) = ? `;
+  const query = `SELECT COALESCE(SUM(amount), 0) AS total_expense 
+                 FROM station_expense 
+                 WHERE station_id = ? 
+                 AND tr_date = ?`;
 
   db.query(query, [station_id, exp_date], (err, result) => {
     if (err) {
