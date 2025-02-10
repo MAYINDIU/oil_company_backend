@@ -20,7 +20,7 @@ router
     "/voucher_unpost_update/:vc_no",
     voucherController.updatePostedDataByVoucherNo
   )
-  .delete("/voucher_delete/:vc_no", voucherController.deleteDataByVoucherNo)
+  .delete("/voucher_delete", voucherController.deleteDataByVoucherNo)
   .delete("/auto_journal_remove/:id", voucherController.deleteDataById);
 
 module.exports = router;
