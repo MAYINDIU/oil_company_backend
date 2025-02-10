@@ -59,6 +59,15 @@ const routes = [
     path: "/api/report",
     route: require("./modules/Reports/Reports.route"),
   },
+
+  {
+    path: "/api/otherexp",
+    route: require("./modules/OthersExpItem/OthersExpItem.route"),
+  },
+  {
+    path: "/api/otherexp-amount",
+    route: require("./modules/StationOthersExpense/StationOthersExpense.route"),
+  },
 ];
 
 routes.forEach(({ path, route }) => app.use(path, route));
