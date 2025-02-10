@@ -29,7 +29,7 @@ const getStationExpenseByStationId = (req, res) => {
 
 const createStationExpense = async (req, res) => {
   try {
-    const { station_id, expitem_id, amount, remarks } = req.body;
+    const { station_id, expitem_id, amount, remarks, tr_date } = req.body;
 
     // Prepare the data to be inserted
     const saveData = {
@@ -37,6 +37,7 @@ const createStationExpense = async (req, res) => {
       expitem_id,
       amount,
       remarks,
+      tr_date,
     };
 
     // Assuming 'stationexpenseModel.createExpenseamount' is the function to insert into the DB
@@ -88,7 +89,7 @@ const getTotalExpensebystation = (req, res) => {
       if (err) {
         return res.status(500).json({ error: "Failed to fetch total expense" });
       }
-      res.status(200).json({
+      res.status(201).json({
         success: true,
         data: result,
       });
