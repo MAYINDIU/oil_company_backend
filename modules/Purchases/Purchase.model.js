@@ -33,7 +33,26 @@ const getAllPurchaseRate = (callback) => {
   });
 };
 
+function updatePurchase(id, data, callback) {
+  const updateQuery =
+    "UPDATE purchase_rate SET " +
+    Object.keys(data)
+      .map((key) => `${key} = ?`)
+      .join(", ") +
+    " WHERE id = ?";
+  const updateValues = [...Object.values(data), id];
+  // console.log("User Service", updateQuery, updateValues);
+  db.query(updateQuery, updateValues, (err, rows) => {
+    if (err) {
+      callback(err, null);
+      return;
+    }
+    callback(null, rows);
+  });
+}
+
 module.exports = {
   createPurchaseRate,
   getAllPurchaseRate,
+  updatePurchase,
 };

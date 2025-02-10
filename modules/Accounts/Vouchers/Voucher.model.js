@@ -144,7 +144,7 @@ const AllJournamModel = {
   receivedAndPaymentModel: (startDate, endDate, callback) => {
     connection.query(
       `SELECT * FROM acc_vouchers WHERE vc_date >= ? AND vc_date <= ? AND vc_type !=1
-       AND active =1 AND post_type !=1 ORDER BY STR_TO_DATE(vc_date, '%Y-%m-%d')`,
+       AND is_posted =1 AND active !=1 ORDER BY STR_TO_DATE(vc_date, '%Y-%m-%d')`,
       [startDate, endDate],
       (err, rows) => {
         if (err) {
@@ -160,7 +160,7 @@ const AllJournamModel = {
     connection.query(
       `SELECT * FROM acc_vouchers WHERE vc_date >= ? AND vc_date <= ? 
       AND ledger_id = ? AND (vc_type = 2 OR vc_type = 4)
-       AND active =1 AND post_type =1 ORDER BY STR_TO_DATE(vc_date, '%Y-%m-%d')`,
+       AND is_posted =1 AND active =1 ORDER BY STR_TO_DATE(vc_date, '%Y-%m-%d')`,
       [startDate, endDate, ledgerId],
       (err, rows) => {
         if (err) {
@@ -176,7 +176,7 @@ const AllJournamModel = {
     connection.query(
       `SELECT * FROM acc_vouchers WHERE vc_date >= ? AND vc_date <= ? 
        AND ledger_id = ? AND (vc_type = 3 OR vc_type = 5)
-       AND active =1 AND post_type =1 ORDER BY STR_TO_DATE(vc_date, '%Y-%m-%d')`,
+       AND is_posted =1 AND active =1 ORDER BY STR_TO_DATE(vc_date, '%Y-%m-%d')`,
       [startDate, endDate, ledgerId],
       (err, rows) => {
         if (err) {
@@ -210,12 +210,12 @@ const AllJournamModel = {
       credit,
       vc_date,
       bank_name,
-      cheque_date,
+      cq_date,
       branch_name,
-      cheque_no,
+      cq_no,
     } = update;
     connection.query(
-      "UPDATE acc_vouchers SET ledger_id = ?, narration = ?, debit = ?, credit = ?, vc_date = ?, bank_name = ?, cheque_date = ?, branch_name = ?, cheque_no = ? WHERE journal_id = ?",
+      "UPDATE acc_vouchers SET ledger_id = ?, narration = ?, debit = ?, credit = ?, vc_date = ?, bank_name = ?, cq_date = ?, branch_name = ?, cq_no = ? WHERE id = ?",
       [
         ledger_id,
         narration,
@@ -223,9 +223,9 @@ const AllJournamModel = {
         credit,
         vc_date,
         bank_name,
-        cheque_date,
+        cq_date,
         branch_name,
-        cheque_no,
+        cq_no,
         journalId,
       ],
       (err, result) => {
@@ -268,7 +268,7 @@ const AllJournamModel = {
 
   deleteById: (acc_vouchersId, callback) => {
     connection.query(
-      "DELETE FROM acc_vouchers WHERE journal_id = ?",
+      "DELETE FROM acc_vouchers WHERE id = ?",
       acc_vouchersId,
       (err, result) => {
         if (err) {

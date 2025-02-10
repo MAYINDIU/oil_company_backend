@@ -48,7 +48,29 @@ const createMasterSummary = async (req, res) => {
   });
 };
 
+const getPreviousStk = (req, res) => {
+  const { station_id } = req.query;
+
+  if (!station_id) {
+    return res.status(400).json({ error: "station_id is required" });
+  }
+
+  mastersummaryModel.getLatestPreviousStock(station_id, (err, result) => {
+    if (err) {
+      console.error("Database error:", err);
+      return res.status(500).json({ error: "Internal Server Error" });
+    }
+
+    if (Object.keys(result).length === 0) {
+      return res.status(201).json({ message: "No data found" });
+    }
+
+    res.status(200).json(result);
+  });
+};
+
 module.exports = {
   createMasterSummaryDetail,
   createMasterSummary,
+  getPreviousStk,
 };

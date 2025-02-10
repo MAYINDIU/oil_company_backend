@@ -5,6 +5,7 @@ function getAllToromba(callback) {
         SELECT 
             t.toromba_id,
             t.station_id,
+            t.rate,
             t.fuel_type,
             t.torombo_no,
             t.torombo_op_b,
@@ -13,7 +14,7 @@ function getAllToromba(callback) {
             t.updated_date,
             b.branch_name
         FROM toromba t
-        LEFT JOIN branch b ON t.station_id = b.branch_id order by t.torombo_no asc`;
+        LEFT JOIN branch b ON t.station_id = b.branch_id order by  t.station_id,t.fuel_type, t.torombo_no ASC`;
 
   db.query(query, (err, results) => {
     if (err) {
@@ -30,6 +31,7 @@ function getSingleStationwiseToromba(station_id, fuel_type, callback) {
             t.toromba_id,
             t.station_id,
             t.fuel_type,
+            t.rate,
             t.torombo_no,
             t.torombo_op_b,
             t.torombo_close_balance,
@@ -80,7 +82,24 @@ function updateToromba(toromba_id, data, callback) {
   });
 }
 
+function getToromboRate(station_id, fuel_type, torombo_no, callback) {
+  const query = `
+        SELECT 
+            rate
+        FROM toromba 
+        WHERE station_id = ? AND fuel_type = ? AND torombo_no=?`; // Adding fuel_type filter
+
+  db.query(query, [station_id, fuel_type, torombo_no], (err, results) => {
+    if (err) {
+      console.error("Error fetching toromba data:", err);
+      return callback(err, null);
+    }
+    callback(null, results);
+  });
+}
+
 module.exports = {
+  getToromboRate,
   createToromba,
   getAllToromba,
   updateToromba,
