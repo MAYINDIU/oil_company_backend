@@ -79,17 +79,21 @@ function getAllExpenseAmounts(req, res) {
 }
 
 const getTotalExpensebystation = (req, res) => {
-  const { station_id } = req.params; // Get the station_id from the request parameters
+  const { station_id, exp_date } = req.params; // Get the station_id from the request parameters
 
-  stationExpenseModel.getTotalExpenseByStation(station_id, (err, result) => {
-    if (err) {
-      return res.status(500).json({ error: "Failed to fetch total expense" });
+  stationExpenseModel.getTotalExpenseByStation(
+    station_id,
+    exp_date,
+    (err, result) => {
+      if (err) {
+        return res.status(500).json({ error: "Failed to fetch total expense" });
+      }
+      res.status(200).json({
+        success: true,
+        data: result,
+      });
     }
-    res.status(200).json({
-      success: true,
-      data: result,
-    });
-  });
+  );
 };
 
 module.exports = {

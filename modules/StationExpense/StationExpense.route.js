@@ -12,7 +12,7 @@ router.get(
 );
 
 router.get(
-  "/total-expense/:station_id",
+  "/total-expense/:station_id/:exp_date",
   stationController.getTotalExpensebystation
 );
 
