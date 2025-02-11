@@ -2,6 +2,28 @@ const ApiError = require("../../errors/APIError");
 const purchaserateModel = require("./Purchase.model");
 const sendResponse = require("../../utilities/sendResponse");
 
+const getTotalExpensebystation = (req, res) => {
+  const { station_id, tr_date, fuel_type } = req.params; // Get the station_id from the request parameters
+
+  console.log(station_id, tr_date, fuel_type);
+  purchaserateModel.getTotalPurchaseByStation(
+    station_id,
+    tr_date,
+    fuel_type,
+    (err, result) => {
+      if (err) {
+        return res
+          .status(500)
+          .json({ error: "Failed to fetch total purchase" });
+      }
+      res.status(201).json({
+        success: true,
+        data: result,
+      });
+    }
+  );
+};
+
 function getAllPurchaseData(req, res) {
   purchaserateModel.getAllPurchaseRate((err, users) => {
     if (err) {
@@ -26,6 +48,7 @@ const createPurchaseRate = async (req, res) => {
       no_truck,
       total_qty,
       total_amt,
+      tr_date,
     } = req.body;
 
     // Calculate unit_p_rate based on total_qty and total_amt
@@ -40,6 +63,7 @@ const createPurchaseRate = async (req, res) => {
       unit_p_rate, // This is now calculated before insertion
       total_qty,
       total_amt,
+      tr_date,
     };
 
     // Insert into database
@@ -85,4 +109,5 @@ module.exports = {
   createPurchaseRate,
   getAllPurchaseData,
   updatePurchase,
+  getTotalExpensebystation,
 };

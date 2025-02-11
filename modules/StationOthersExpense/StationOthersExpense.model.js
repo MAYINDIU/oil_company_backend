@@ -4,7 +4,7 @@ const getTotalExpenseByStation = (station_id, exp_date, callback) => {
   const query = `SELECT SUM(amount) AS total_expense
 FROM others_exp 
 WHERE station_id = ?
-AND DATE(created_date) = ? `;
+AND tr_date = ? `;
 
   db.query(query, [station_id, exp_date], (err, result) => {
     if (err) {
