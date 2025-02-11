@@ -21,6 +21,7 @@ LEFT JOIN branch b
     ON md.station_id = b.branch_id  
 WHERE ms.station_id = ? 
 AND ms.tr_date = ?
+ORDER BY md.torambo_no ASC
   `;
 
   db.query(query, [station_id, tr_date], (err, results) => {

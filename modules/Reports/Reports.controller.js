@@ -24,6 +24,7 @@ const getSummaryData = (req, res) => {
         return res.status(201).json({ message: "No data found" });
       }
 
+
       // Extract all summary data
       const summaryData = {
         station_id: results[0].station_id,
