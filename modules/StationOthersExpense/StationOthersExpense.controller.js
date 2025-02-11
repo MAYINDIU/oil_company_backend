@@ -4,7 +4,7 @@ const sendResponse = require("../../utilities/sendResponse");
 
 const createStationExpense = async (req, res) => {
   try {
-    const { station_id, other_expitem_id, amount, remarks } = req.body;
+    const { station_id, other_expitem_id, amount, remarks, tr_date } = req.body;
 
     // Prepare the data to be inserted
     const saveData = {
@@ -12,6 +12,7 @@ const createStationExpense = async (req, res) => {
       other_expitem_id,
       amount,
       remarks,
+      tr_date,
     };
 
     // Assuming 'stationexpenseModel.createExpenseamount' is the function to insert into the DB
