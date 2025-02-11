@@ -1,6 +1,7 @@
 const express = require("express");
 const userController = require("./Users.controller");
-const verifyToken = require("../../utilities/verifyToken");
+// const verifyToken = require("../../utilities/verifyToken");
+// const verifyToken = require("../../middlewares/verifyToken.js");
 const router = express.Router();
 
 // Prefix all routes with '/api'
@@ -11,9 +12,9 @@ router.post("/signin", userController.login);
 router.patch("/update-user/:id", userController.updateUser);
 router.put(
   "/check-password/:id",
-  verifyToken,
+
   userController.userCheckPassword
 );
-router.put("/change-password/:id", verifyToken, userController.changePassword);
+router.put("/change-password/:id", userController.changePassword);
 
 module.exports = router;

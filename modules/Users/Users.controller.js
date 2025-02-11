@@ -10,7 +10,9 @@ const {
 } = require("../../utilities/passwordEncryption");
 const config = require("../../config/db.js");
 const catchAsync = require("../../utilities/catchAsync");
+const { generateToken } = require("../../utilities/jwt.js");
 const { JWT_SECRET } = process.env;
+// const { generateToken } = require("../../utilities/token.js");
 
 function getAllUsers(req, res) {
   userModel.getAllUsers((err, users) => {
@@ -117,7 +119,12 @@ const login = (req, res) => {
       }
 
       // Generate JWT Token
-      const token = jwt.sign({ id: user.id }, JWT_SECRET, { expiresIn: "1h" });
+      // const token = jwt.sign({ id: user.id }, JWT_SECRET, { expiresIn: "1h" });
+      const token = generateToken({
+        id: user.id,
+        emptype: user.emptype,
+        email: user?.email,
+      });
 
       // Update last login time
       db.query(

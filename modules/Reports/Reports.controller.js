@@ -24,6 +24,7 @@ const getSummaryData = (req, res) => {
         return res.status(201).json({ message: "No data found" });
       }
 
+
       // Extract all summary data
       const summaryData = {
         station_id: results[0].station_id,
@@ -72,6 +73,7 @@ const getSummaryData = (req, res) => {
         available_cash: results[0].available_cash,
         expense_add: results[0].expense_add,
         extra_oil_purchase_cash: results[0].extra_oil_purchase_cash,
+        other_expense: results[0].other_expense,
       };
 
       // Group m_detail by fuel_type

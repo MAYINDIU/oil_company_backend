@@ -1,13 +1,15 @@
 const express = require("express");
 const router = express.Router();
 const accLedgerController = require("./Ledger.controller");
-// const authMiddleware = require("../../../middleware/authMiddleware");
+const authMiddleware = require("../../../middlewares/authMiddleware.js");
+// const verifyToken = require("../../../utilities/verifyToken.js");
 
 router
   .post("/create_acc_ledger", accLedgerController.createData)
   .get(
     "/all_acc_ledger",
-    // authMiddleware(["admin", "user"]),
+    authMiddleware(["admin", "user"]),
+    // verifyToken,
     accLedgerController.getAllData
   )
   .get(
