@@ -9,7 +9,7 @@ router.get("/all-purchase-rate", purchaserateController.getAllPurchaseData);
 router.patch("/update-purchase/:id", purchaserateController.updatePurchase);
 
 router.get(
-  "/total-purchase/:station_id/:tr_date/:fuel_type",
+  "/total-purchase/:station_id/:tr_date",
   purchaserateController.getTotalExpensebystation
 );
 
