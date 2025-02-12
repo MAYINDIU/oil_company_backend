@@ -125,6 +125,12 @@ const login = (req, res) => {
         emptype: user.emptype,
         email: user?.email,
       });
+      const userData = {
+        id: user?.id,
+        emptype: user?.emptype,
+        email: user?.email,
+        username: user?.username,
+      };
 
       // Update last login time
       db.query(
@@ -137,7 +143,9 @@ const login = (req, res) => {
         }
       );
 
-      return res.status(200).json({ message: "Login successful", token, user });
+      return res
+        .status(200)
+        .json({ message: "Login successful", token, user: userData });
     });
   });
 };

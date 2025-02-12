@@ -1,13 +1,17 @@
 const express = require("express");
 const router = express.Router();
 const accMainController = require("./Group.controller");
-// const authMiddleware = require("../../../middleware/authMiddleware");
+const authMiddleware = require("../../../middlewares/authMiddleware.js");
 
 router
-  .post("/create_acc_main", accMainController.createData)
+  .post(
+    "/create_acc_main",
+    authMiddleware(["admin", "user"]),
+    accMainController.createData
+  )
   .get(
     "/all_acc_main",
-    // authMiddleware(["admin", "user"]),
+    authMiddleware(["admin", "user"]),
     accMainController.getAllData
   )
   .get(
@@ -17,12 +21,12 @@ router
   )
   .patch(
     "/acc_main_update/:id",
-    // authMiddleware(["admin"]),
+    authMiddleware(["admin"]),
     accMainController.updateDataById
   )
   .delete(
     "/acc_main_delete/:id",
-    // authMiddleware(["admin"]),
+    authMiddleware(["admin"]),
     accMainController.deleteDataById
   );
 

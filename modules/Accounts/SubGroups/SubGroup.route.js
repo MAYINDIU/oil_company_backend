@@ -1,13 +1,17 @@
 const express = require("express");
 const router = express.Router();
 const accSubController = require("./SubGroup.controller");
-// const authMiddleware = require("../../../middleware/authMiddleware");
+const authMiddleware = require("../../../middlewares/authMiddleware.js");
 
 router
-  .post("/create_acc_sub", accSubController.createData)
+  .post(
+    "/create_acc_sub",
+    authMiddleware(["admin", "user"]),
+    accSubController.createData
+  )
   .get(
     "/all_acc_sub",
-    // authMiddleware(["admin", "user"]),
+    authMiddleware(["admin", "user"]),
     accSubController.getAllData
   )
   .get(
@@ -17,12 +21,12 @@ router
   )
   .patch(
     "/acc_sub_update/:id",
-    // authMiddleware(["admin"]),
+    authMiddleware(["admin"]),
     accSubController.updateDataById
   )
   .delete(
     "/acc_sub_delete/:id",
-    // authMiddleware(["admin"]),
+    authMiddleware(["admin"]),
     accSubController.deleteDataById
   );
 
