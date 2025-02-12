@@ -5,7 +5,6 @@ const sendResponse = require("../../utilities/sendResponse");
 const getTotalExpensebystation = (req, res) => {
   const { station_id, tr_date } = req.params; // Get the station_id from the request parameters
 
-  console.log(station_id, tr_date);
   purchaserateModel.getTotalPurchaseByStation(
     station_id,
     tr_date,
