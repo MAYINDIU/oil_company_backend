@@ -31,17 +31,24 @@ const dotenv = require("dotenv");
 // };
 
 const getTotalPurchaseByStation = (station_id, tr_date, callback) => {
-  const query = `SELECT 
+  const query = `SELECT
     pr.fuel_type,
-    SUM(pr.total_qty) AS total_quantity, 
-    SUM(pr.total_amt) AS total_amount, 
-    SUM(pr.no_truck) AS total_trucks
+    SUM(pr.total_qty) AS total_quantity,
+    SUM(pr.total_amt) AS total_amount,
+    SUM(pr.no_truck) AS total_trucks,
+    b.branch_name,
+    s.supplier_name
 FROM purchase_rate pr
-WHERE 
-    pr.station_id = ? 
-    AND pr.tr_date = ? 
-GROUP BY pr.fuel_type
-ORDER BY pr.fuel_type`;
+LEFT JOIN branch b ON pr.station_id = b.branch_id
+LEFT JOIN suppliers s ON pr.supplier_id = s.supplier_id
+WHERE
+    pr.station_id = ?  
+    AND pr.tr_date = ?  
+GROUP BY 
+    pr.fuel_type, b.branch_name, pr.station_id, s.supplier_name
+ORDER BY 
+    pr.fuel_type
+`;
 
   db.query(query, [station_id, tr_date], (err, result) => {
     if (err) {
@@ -66,14 +73,14 @@ function createPurchaseRate(PurchaseRate, callback) {
 
 const getAllPurchaseRate = (callback) => {
   const query = `
-        SELECT 
-            pr.*, 
-            b.branch_name, 
-            s.supplier_name
-        FROM purchase_rate pr
-        LEFT JOIN branch b ON pr.station_id = b.branch_id
-        LEFT JOIN suppliers s ON pr.supplier_id = s.supplier_id
-    `;
+       SELECT 
+    pr.*, 
+    b.branch_name, 
+    s.supplier_name
+FROM purchase_rate pr
+LEFT JOIN branch b ON pr.station_id = b.branch_id
+LEFT JOIN suppliers s ON pr.supplier_id = s.supplier_id
+ORDER BY pr.station_id, b.branch_id,pr.fuel_type`;
 
   db.query(query, (err, results) => {
     if (err) {
