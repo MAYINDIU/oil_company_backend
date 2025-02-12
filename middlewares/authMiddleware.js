@@ -3,7 +3,6 @@ const { verifyToken } = require("../utilities/jwt.js");
 const authMiddleware = (roles = []) => {
   return (req, res, next) => {
     const authHeader = req.headers?.authorization;
-    console.log(req, res);
 
     if (!authHeader || !authHeader.startsWith("Bearer ")) {
       return res.status(401).json({ error: "Unauthorized" });
