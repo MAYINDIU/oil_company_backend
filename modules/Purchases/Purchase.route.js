@@ -20,7 +20,7 @@ router.get(
 
 
 router.get(
-  "/station_wise_ledger_report/:from_date/:to_date/:station_id",
+  "/station_wise_ledger_report",
   purchaserateController.getStationwiseLedgerreport
 );
 module.exports = router;

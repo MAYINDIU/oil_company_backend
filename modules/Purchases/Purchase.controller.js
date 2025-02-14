@@ -6,7 +6,7 @@ const sendResponse = require("../../utilities/sendResponse");
 
 
 const getStationwiseLedgerreport = (req, res) => {
-  const { from_date, to_date, station_id } = req.params;
+  const { from_date, to_date, station_id } = req.query;
 
   purchaserateModel.getStationwiseLedger(from_date, to_date, station_id, (err, result) => {
     if (err) {
