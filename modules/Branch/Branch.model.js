@@ -1,7 +1,7 @@
 const db = require("../../config/db.js");
 
 function getAllBranch(callback) {
-  db.query("SELECT * FROM branch ", (err, results) => {
+  db.query("SELECT * FROM branch ORDER BY branch_name ", (err, results) => {
     if (err) {
       callback(err, null);
     } else {

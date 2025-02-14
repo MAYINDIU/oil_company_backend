@@ -42,6 +42,32 @@ function getAllstationExpensebystationid(station_id, callback) {
   });
 }
 
+function allStationExp(station_id, fromDate, toDate, callback) {
+  let query = `
+      SELECT 
+          s.expense_id,
+          s.station_id,
+          s.expitem_id,
+          s.amount,
+          s.remarks,
+          s.tr_date,
+          s.created_date,
+          exp.expense_name
+      FROM station_expense s
+      JOIN expense_item exp ON s.expitem_id  = exp.exp_id
+      WHERE s.station_id = ? AND  s.tr_date >= ? AND s.tr_date <= ?
+      ORDER BY exp.expense_name ASC
+  `;
+
+  db.query(query, [station_id, fromDate, toDate], (err, results) => {
+    if (err) {
+      console.error("Error fetching toromba data:", err);
+      return callback(err, null);
+    }
+    callback(null, results);
+  });
+}
+
 function getAllstationExpense(callback) {
   const query = `
     SELECT 
@@ -84,6 +110,7 @@ function createExpenseamount(user, callback) {
 module.exports = {
   createExpenseamount,
   getAllstationExpense,
+  allStationExp,
   getAllstationExpensebystationid,
   getTotalExpenseByStation,
 };
