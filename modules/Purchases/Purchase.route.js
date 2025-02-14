@@ -14,7 +14,7 @@ router.get(
 );
 
 router.get(
-  "/station_wise_ledger_report/:from_date/:to_date/:supplier_id",
+  "/supplier_wise_ledger_report/:from_date/:to_date/:supplier_id",
   purchaserateController.getLedgerReport
 );
 
