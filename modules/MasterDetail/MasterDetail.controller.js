@@ -10,7 +10,6 @@ const createOrUpdateMasterData = (req, res) => {
     previous_reading,
     present_reading,
     sale_unit,
-    tr_date,
   } = req.body;
 
   // if (
@@ -70,7 +69,6 @@ const createOrUpdateMasterData = (req, res) => {
           previous_reading: present_reading,
           present_reading,
           sale_unit: present_reading - previous_reading,
-          tr_date,
         };
 
         masterModel.insertMasterData(newRecord, (insertErr, insertResults) => {
@@ -96,11 +94,9 @@ const createMasterDetail = async (req, res) => {
       previous_reading,
       present_reading,
       sale_unit,
-      tr_date,
-      rate,
     } = req.body;
 
-    const addCalculation = (sale_unit * rate) / 100;
+    const addCalculation = (sale_unit * 5) / 100;
 
     // Prepare data for insertion
     const saveData = {
@@ -110,24 +106,20 @@ const createMasterDetail = async (req, res) => {
       previous_reading,
       present_reading,
       sale_unit,
-      addition: addCalculation || 0,
-      tr_date: tr_date, // Default addition to 0 if not provided
+      addition: addCalculation || 0, // Default addition to 0 if not provided
     };
 
+    // Insert into database
     masterModel.createMasterData(saveData, (err, result) => {
       if (err) {
-        // If an error occurs (either a database error or a duplicate record)
-        return res.status(200).json({
-          success: false,
-          message: err || "Failed to create the record",
-        });
+        console.error("Error inserting master detail reading:", err);
+        return res.status(500).json({ error: "Internal Server Error" });
       }
 
-      // If the record was successfully created
-      return res.status(200).json({
+      res.status(201).json({
         success: true,
-        message: "Master detail created successfully",
-        data: result,
+        message: "Master detail  created successfully",
+        id: result.insertId,
       });
     });
   } catch (error) {
@@ -174,13 +166,11 @@ const getFueltypeMdetail = (req, res) => {
         console.error("Error fetching toromba data:", err);
         return res.status(500).json({ error: "Internal Server Error" });
       }
-
       if (results.length === 0) {
         return res
           .status(201)
           .json({ message: "No toromba records found for the specified date" });
       }
-
       res.status(200).json(results);
     }
   );
@@ -210,50 +200,25 @@ const getPreviousReadings = (req, res) => {
   );
 };
 
-const updateReading = async (req, res) => {
-  try {
-    const {
-      updatedPreviousReading,
-      present_reading,
-      station_id,
-      fuel_type,
-      torambo_no,
-    } = req.body;
 
-    if (
-      !updatedPreviousReading ||
-      !present_reading ||
-      !station_id ||
-      !fuel_type ||
-      !torambo_no
-    ) {
-      return res.status(400).json({ message: "All fields are required" });
+const getPrevReadingData = (req, res) => {
+  const { station_id, fuel_type, torambo_no, tr_date } = req.query;
+
+  // Call the service to get previous reading
+  masterModel.getPrevReading(station_id, fuel_type, torambo_no, tr_date, (err, result) => {
+    if (err) {
+      return res.status(500).json({ error: "Internal server error", details: err });
     }
 
-    console.log(
-      updatedPreviousReading,
-      present_reading,
-      station_id,
-      fuel_type,
-      torambo_no
-    );
+    if (result.message) {
+      return res.status(404).json(result); // No previous reading found
+    }
 
-    // Call model function with a promise
-    const result = await masterModel.updateMasterDatas(
-      updatedPreviousReading,
-      present_reading,
-      station_id,
-      fuel_type,
-      torambo_no
-    );
-
-    return res
-      .status(200)
-      .json({ message: "Data updated successfully", result });
-  } catch (err) {
-    console.error("Error updating master data:", err);
-    return res.status(500).json({ message: "Internal server error" });
-  }
+    return res.status(201).json({
+      success: true,
+      previousReading: result, // Send the reading as response
+    });
+  });
 };
 
 module.exports = {
@@ -262,5 +227,5 @@ module.exports = {
   createOrUpdateMasterData,
   getFueltypeMdetail,
   getPreviousReadings,
-  updateReading,
+  getPrevReadingData
 };

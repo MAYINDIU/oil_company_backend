@@ -106,7 +106,7 @@ const getLedgerReport = (req, res) => {
 
     // Process the result to group and aggregate the data by tr_date
     const processedData = result.reduce((acc, row) => {
-      const { tr_date, fuel_type, total_qty, total_amt, supplier_name } = row;
+      const { tr_date, fuel_type, total_qty, total_amt, supplier_name,station_name } = row;
 
       // Ensure tr_date is handled correctly in UTC by creating a UTC date object
       const dateObj = new Date(tr_date);
@@ -125,7 +125,8 @@ const getLedgerReport = (req, res) => {
       if (!acc[dateKey]) {
         acc[dateKey] = {
           date: dateKey,
-          supplier_name, // Add the supplier_name here
+          supplier_name,
+          station_name, // Add the supplier_name here
           qty91: 0,
           amount91: 0,
           qty95: 0,
