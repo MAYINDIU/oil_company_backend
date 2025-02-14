@@ -2,6 +2,56 @@ const ApiError = require("../../errors/APIError");
 const purchaserateModel = require("./Purchase.model");
 const sendResponse = require("../../utilities/sendResponse");
 
+
+
+
+const getLedgerReport = (req, res) => {
+  const { from_date, to_date, supplier_id } = req.params;
+
+
+
+  console.log("Fetching ledger report for:", { from_date, to_date, supplier_id });
+
+  purchaserateModel.getStationwiseLedger(from_date, to_date, supplier_id, (err, result) => {
+    if (err) {
+      console.error("Database Error:", err);
+      return res.status(500).json({ error: "Failed to fetch ledger report" });
+    }
+
+    res.status(200).json({
+      success: true,
+      data: result,
+    });
+  });
+};
+
+
+
+
+
+
+
+const getTotalExpensebystation = (req, res) => {
+  const { station_id, tr_date } = req.params; // Get the station_id from the request parameters
+
+  purchaserateModel.getTotalPurchaseByStation(
+    station_id,
+    tr_date,
+
+    (err, result) => {
+      if (err) {
+        return res
+          .status(500)
+          .json({ error: "Failed to fetch total purchase" });
+      }
+      res.status(201).json({
+        success: true,
+        data: result,
+      });
+    }
+  );
+};
+
 function getAllPurchaseData(req, res) {
   purchaserateModel.getAllPurchaseRate((err, users) => {
     if (err) {
@@ -19,15 +69,29 @@ function getAllPurchaseData(req, res) {
 
 const createPurchaseRate = async (req, res) => {
   try {
-    const { station_id, supplier_id, fuel_type, p_rate, quantity_unit } =
-      req.body;
+    const {
+      station_id,
+      supplier_id,
+      fuel_type,
+      no_truck,
+      total_qty,
+      total_amt,
+      tr_date,
+    } = req.body;
+
+    // Calculate unit_p_rate based on total_qty and total_amt
+    const unit_p_rate = total_amt / total_qty;
+
     // Prepare data for insertion
     const saveData = {
       station_id,
       supplier_id,
       fuel_type,
-      p_rate,
-      quantity_unit,
+      no_truck,
+      unit_p_rate, // This is now calculated before insertion
+      total_qty,
+      total_amt,
+      tr_date,
     };
 
     // Insert into database
@@ -49,7 +113,30 @@ const createPurchaseRate = async (req, res) => {
   }
 };
 
+const updatePurchase = async (req, res) => {
+  const { id } = req.params;
+
+  const { ...data } = req.body;
+  // console.log(id, data);
+  purchaserateModel.updatePurchase(id, data, (err, user) => {
+    if (err) {
+      // console.log(err);
+      throw new ApiError(500, err.message);
+    } else {
+      sendResponse(res, {
+        statusCode: 200,
+        success: true,
+        message: "Purchase updated successfully",
+        data: user,
+      });
+    }
+  });
+};
+
 module.exports = {
   createPurchaseRate,
   getAllPurchaseData,
+  updatePurchase,
+  getTotalExpensebystation,
+  getLedgerReport
 };

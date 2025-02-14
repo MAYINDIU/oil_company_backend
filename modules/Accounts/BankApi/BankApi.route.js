@@ -1,33 +1,33 @@
 const express = require("express");
 const router = express.Router();
-const accSubController = require("./SubGroup.controller");
+const bankController = require("./BankApi.controller");
 const authMiddleware = require("../../../middlewares/authMiddleware.js");
 
 router
   .post(
-    "/create_acc_sub",
+    "/create_bank",
     authMiddleware(["admin", "user"]),
-    accSubController.createData
+    bankController.createData
   )
   .get(
-    "/all_acc_sub",
+    "/all_bank",
     authMiddleware(["admin", "user"]),
-    accSubController.getAllData
+    bankController.getAllData
   )
   .get(
-    "/acc_sub/:id",
+    "/bank/:id",
     // authMiddleware(["admin", "user"]),
-    accSubController.getDataById
+    bankController.getDataById
   )
   .patch(
-    "/acc_sub_update/:id",
+    "/bank_update/:id",
     authMiddleware(["admin"]),
-    accSubController.updateDataById
+    bankController.updateDataById
   )
   .delete(
-    "/acc_sub_delete/:id",
+    "/bank_delete/:id",
     authMiddleware(["admin"]),
-    accSubController.deleteDataById
+    bankController.deleteDataById
   );
 
 module.exports = router;

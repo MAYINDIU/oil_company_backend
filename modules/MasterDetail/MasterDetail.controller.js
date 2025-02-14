@@ -10,6 +10,7 @@ const createOrUpdateMasterData = (req, res) => {
     previous_reading,
     present_reading,
     sale_unit,
+    tr_date,
   } = req.body;
 
   // if (
@@ -69,6 +70,7 @@ const createOrUpdateMasterData = (req, res) => {
           previous_reading: present_reading,
           present_reading,
           sale_unit: present_reading - previous_reading,
+          tr_date,
         };
 
         masterModel.insertMasterData(newRecord, (insertErr, insertResults) => {
@@ -94,9 +96,11 @@ const createMasterDetail = async (req, res) => {
       previous_reading,
       present_reading,
       sale_unit,
+      tr_date,
+      rate,
     } = req.body;
 
-    const addCalculation = (sale_unit * 5) / 100;
+    const addCalculation = (sale_unit * rate) / 100;
 
     // Prepare data for insertion
     const saveData = {
@@ -106,20 +110,24 @@ const createMasterDetail = async (req, res) => {
       previous_reading,
       present_reading,
       sale_unit,
-      addition: addCalculation || 0, // Default addition to 0 if not provided
+      addition: addCalculation || 0,
+      tr_date: tr_date, // Default addition to 0 if not provided
     };
 
-    // Insert into database
     masterModel.createMasterData(saveData, (err, result) => {
       if (err) {
-        console.error("Error inserting master detail reading:", err);
-        return res.status(500).json({ error: "Internal Server Error" });
+        // If an error occurs (either a database error or a duplicate record)
+        return res.status(200).json({
+          success: false,
+          message: err || "Failed to create the record",
+        });
       }
 
-      res.status(201).json({
+      // If the record was successfully created
+      return res.status(200).json({
         success: true,
-        message: "Master detail  created successfully",
-        id: result.insertId,
+        message: "Master detail created successfully",
+        data: result,
       });
     });
   } catch (error) {
@@ -202,10 +210,57 @@ const getPreviousReadings = (req, res) => {
   );
 };
 
+const updateReading = async (req, res) => {
+  try {
+    const {
+      updatedPreviousReading,
+      present_reading,
+      station_id,
+      fuel_type,
+      torambo_no,
+    } = req.body;
+
+    if (
+      !updatedPreviousReading ||
+      !present_reading ||
+      !station_id ||
+      !fuel_type ||
+      !torambo_no
+    ) {
+      return res.status(400).json({ message: "All fields are required" });
+    }
+
+    console.log(
+      updatedPreviousReading,
+      present_reading,
+      station_id,
+      fuel_type,
+      torambo_no
+    );
+
+    // Call model function with a promise
+    const result = await masterModel.updateMasterDatas(
+      updatedPreviousReading,
+      present_reading,
+      station_id,
+      fuel_type,
+      torambo_no
+    );
+
+    return res
+      .status(200)
+      .json({ message: "Data updated successfully", result });
+  } catch (err) {
+    console.error("Error updating master data:", err);
+    return res.status(500).json({ message: "Internal server error" });
+  }
+};
+
 module.exports = {
   createMasterDetail,
   getSingleMdetail,
   createOrUpdateMasterData,
   getFueltypeMdetail,
   getPreviousReadings,
+  updateReading,
 };

@@ -1,6 +1,5 @@
 const db = require("../../config/db.js");
 
-// Function to find a record by station_id, fuel_type, and torambo_no
 const findByStationFuelTorambo = (
   station_id,
   fuel_type,
@@ -54,16 +53,49 @@ const insertMasterData = (mDetail, callback) => {
 };
 
 //  master details entry
+// function createMasterData(mDetail, callback) {
+//   db.query("INSERT INTO m_detail  SET ?", mDetail, (err, results) => {
+//     if (err) {
+//       // Fix the variable name from `err` to `error`
+//       callback(err, null);
+//       return;
+//     } else {
+//       callback(null, results);
+//     }
+//   });
+// }
+
 function createMasterData(mDetail, callback) {
-  db.query("INSERT INTO m_detail  SET ?", mDetail, (err, results) => {
-    if (err) {
-      // Fix the variable name from `err` to `error`
-      callback(err, null);
-      return;
-    } else {
-      callback(null, results);
+  const { station_id, tr_date, fuel_type, torambo_no } = mDetail;
+
+  // Step 1: Check if the record already exists
+  db.query(
+    "SELECT * FROM m_detail WHERE station_id = ? AND tr_date = ? AND fuel_type=? AND torambo_no=?",
+    [station_id, tr_date, fuel_type, torambo_no],
+    (err, results) => {
+      if (err) {
+        callback(err, null); // Handle database error
+        return;
+      }
+
+      if (results.length > 0) {
+        // Record exists, handle the case (return an error or update, depending on your requirement)
+        callback(
+          "Record already exists for the given station_id and tr_date",
+          null
+        );
+      } else {
+        // Step 2: Insert the new record if it doesn't exist
+        db.query("INSERT INTO m_detail SET ?", mDetail, (err, results) => {
+          if (err) {
+            callback(err, null); // Handle insertion error
+          } else {
+            callback(null, results); // Return the results from the insertion
+          }
+        });
+      }
     }
-  });
+  );
 }
 
 const getFilteredMDetail = (station_id, fuel_type, torambo_no, callback) => {
@@ -138,6 +170,37 @@ const getPreviousReading = (station_id, fuel_type, torambo_no, callback) => {
   });
 };
 
+const updateMasterDatas = (
+  updatedPreviousReading,
+  present_reading,
+  station_id,
+  fuel_type,
+  torambo_no,
+  callback
+) => {
+  const query = `
+    UPDATE update_reading 
+    SET 
+      previous_reading = ?, 
+      present_reading = ?, 
+    WHERE 
+      station_id = ? 
+      AND fuel_type = ? 
+      AND torambo_no = ?
+  `;
+  db.query(
+    query,
+    [
+      updatedPreviousReading,
+      present_reading,
+      station_id,
+      fuel_type,
+      torambo_no,
+    ],
+    callback
+  );
+};
+
 module.exports = {
   createMasterData,
   getFilteredMDetail,
@@ -146,4 +209,5 @@ module.exports = {
   insertMasterData,
   getFueltypeMDetail,
   getPreviousReading,
+  updateMasterDatas,
 };

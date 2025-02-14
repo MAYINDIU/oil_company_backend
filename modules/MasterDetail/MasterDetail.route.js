@@ -11,4 +11,6 @@ router.post("/update-reading", mdetilController.createOrUpdateMasterData);
 
 router.get("/previous-reading-get", mdetilController.getPreviousReadings);
 
+router.put("/update-readings", mdetilController.updateReading);
+
 module.exports = router;

@@ -39,6 +39,24 @@ function createMasterSummaryDatacheck(mDetail, callback) {
   );
 }
 
+const getLatestPreviousStock = (station_id, callback) => {
+  const query = `
+    SELECT previous_patrol_95, previous_patrol_91, previous_diesel,available_cash
+    FROM master_summary
+    WHERE station_id = ?
+    ORDER BY STR_TO_DATE(tr_date, '%Y-%m-%d') DESC
+    LIMIT 1;
+  `;
+
+  db.query(query, [station_id], (err, results) => {
+    if (err) {
+      return callback(err, null);
+    }
+    callback(null, results[0] || {}); // Return empty object if no data found
+  });
+};
+
 module.exports = {
   createMasterSummaryDatacheck,
+  getLatestPreviousStock,
 };
