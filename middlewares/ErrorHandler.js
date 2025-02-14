@@ -1,6 +1,6 @@
 
-const config = require("../config");
-const ApiError = require("../errors/APIError");
+const config = require("../config/db.js");
+const ApiError = require("../errors/APIError.js");
 
 // eslint-disable-next-line no-unused-vars
 const ErrorHandler = (error, req, res, next) => {
