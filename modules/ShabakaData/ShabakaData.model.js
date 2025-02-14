@@ -30,9 +30,7 @@ exports.getAll = (station, fromDate, toDate, callback) => {
       ORDER BY br.branch_name ASC
   `;
 
-  const params = [station, fromDate, toDate];
-
-  connection.query(query, params, (err, results) => {
+  connection.query(query, [station, fromDate, toDate], (err, results) => {
     if (err) {
       callback(err, null);
       return;
