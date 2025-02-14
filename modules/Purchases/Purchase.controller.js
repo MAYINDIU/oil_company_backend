@@ -5,14 +5,26 @@ const sendResponse = require("../../utilities/sendResponse");
 
 
 
+const getStationwiseLedgerreport = (req, res) => {
+  const { from_date, to_date, station_id } = req.params;
+
+  purchaserateModel.getStationwiseLedger(from_date, to_date, station_id, (err, result) => {
+    if (err) {
+      console.error("Database Error:", err);
+      return res.status(500).json({ error: "Failed to fetch ledger report" });
+    }
+
+    res.status(201).json({
+      success: true,
+      data: result,
+    });
+  });
+};
+
 const getLedgerReport = (req, res) => {
-  const { from_date, to_date, supplier_id } = req.params;
+  const { from_date, to_date, supplier_id } = req.query;  // Corrected req.quer to req.query
 
-
-
-  console.log("Fetching ledger report for:", { from_date, to_date, supplier_id });
-
-  purchaserateModel.getStationwiseLedger(from_date, to_date, supplier_id, (err, result) => {
+  purchaserateModel.getSupplierwiseLedger(from_date, to_date, supplier_id, (err, result) => {
     if (err) {
       console.error("Database Error:", err);
       return res.status(500).json({ error: "Failed to fetch ledger report" });
@@ -24,6 +36,7 @@ const getLedgerReport = (req, res) => {
     });
   });
 };
+
 
 
 
@@ -138,5 +151,6 @@ module.exports = {
   getAllPurchaseData,
   updatePurchase,
   getTotalExpensebystation,
-  getLedgerReport
+  getLedgerReport,
+  getStationwiseLedgerreport
 };

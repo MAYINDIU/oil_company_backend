@@ -3,8 +3,32 @@ const dotenv = require("dotenv");
 
 
 
+const getStationwiseLedger = (from_date, to_date, station_id, callback) => {
+  const query = `SELECT
+    pr.tr_date,
+    pr.fuel_type,
+    SUM(pr.total_qty) AS total_qty,
+    SUM(pr.total_amt) AS total_amt,
+    b.branch_name AS station_name,
+    s.supplier_name
+FROM purchase_rate pr
+JOIN branch b ON b.branch_id = pr.station_id
+JOIN suppliers s ON s.supplier_id = pr.supplier_id
+WHERE pr.tr_date BETWEEN ? AND ?
+AND pr.station_id = ?
+GROUP BY pr.tr_date, pr.fuel_type
+ORDER BY pr.tr_date, pr.fuel_type`;
 
-const getStationwiseLedger = (from_date, to_date, supplier_id, callback) => {
+  db.query(query, [from_date, to_date, station_id], (err, result) => {
+    if (err) {
+      console.error("Error fetching total expense:", err);
+      return callback(err, null);
+    }
+    callback(null, result);
+  });
+};
+
+const getSupplierwiseLedger = (from_date, to_date, supplier_id, callback) => {
   const query = ` SELECT
       pr.total_qty,
       pr.total_amt,
@@ -110,5 +134,6 @@ module.exports = {
   getAllPurchaseRate,
   updatePurchase,
   getTotalPurchaseByStation,
+  getSupplierwiseLedger,
   getStationwiseLedger
 };
