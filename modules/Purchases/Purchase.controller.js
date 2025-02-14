@@ -30,28 +30,34 @@ const getLedgerReport = (req, res) => {
       return res.status(500).json({ error: "Failed to fetch ledger report" });
     }
 
-    // Process the result to group and aggregate the data by date
+    // Process the result to group and aggregate the data by tr_date
     const processedData = result.reduce((acc, row) => {
-      const { tr_date, supplier_name, fuel_type, total_qty, total_amt } = row;
+      const { tr_date, fuel_type, total_qty, total_amt } = row;
 
-      // Ensure tr_date is a string (in ISO format) to safely split it
-      const dateKey = new Date(tr_date).toISOString().split("T")[0]; // Convert to ISO string and get the date part
+      // Ensure tr_date is handled correctly in UTC by creating a UTC date object
+      const dateObj = new Date(tr_date);
+
+      // Add 1 day to the date
+      dateObj.setDate(dateObj.getDate() + 1);
+
+      // Manually format the date as 'DD-MM-YYYY'
+      const day = String(dateObj.getUTCDate()).padStart(2, '0');  // Ensure 2-digit day
+      const month = String(dateObj.getUTCMonth() + 1).padStart(2, '0');  // Ensure 2-digit month
+      const year = dateObj.getUTCFullYear();
+
+      const dateKey = `${day}-${month}-${year}`;  // Format as 'DD-MM-YYYY'
 
       // If the date is not yet in the accumulator, initialize it
       if (!acc[dateKey]) {
         acc[dateKey] = {
           date: dateKey,
-          supplierName: supplier_name,
           qty91: 0,
           amount91: 0,
           qty95: 0,
           amount95: 0,
           qtyDiesel: 0,
           amountDiesel: 0,
-          totalAmount: 0,
-          cash: 0,
-          bank: 0,
-          total: 0
+          totalAmount: 0
         };
       }
 
@@ -89,6 +95,12 @@ const getLedgerReport = (req, res) => {
     });
   });
 };
+
+
+
+
+
+
 
 
 
