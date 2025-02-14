@@ -22,7 +22,7 @@ const getStationwiseLedgerreport = (req, res) => {
 };
 
 const getLedgerReport = (req, res) => {
-  const { from_date, to_date, supplier_id } = req.query;  // Corrected req.quer to req.query
+  const { from_date, to_date, supplier_id } = req.query;
 
   purchaserateModel.getSupplierwiseLedger(from_date, to_date, supplier_id, (err, result) => {
     if (err) {
@@ -30,12 +30,66 @@ const getLedgerReport = (req, res) => {
       return res.status(500).json({ error: "Failed to fetch ledger report" });
     }
 
+    // Process the result to group and aggregate the data by date
+    const processedData = result.reduce((acc, row) => {
+      const { tr_date, supplier_name, fuel_type, total_qty, total_amt } = row;
+
+      // Ensure tr_date is a string (in ISO format) to safely split it
+      const dateKey = new Date(tr_date).toISOString().split("T")[0]; // Convert to ISO string and get the date part
+
+      // If the date is not yet in the accumulator, initialize it
+      if (!acc[dateKey]) {
+        acc[dateKey] = {
+          date: dateKey,
+          supplierName: supplier_name,
+          qty91: 0,
+          amount91: 0,
+          qty95: 0,
+          amount95: 0,
+          qtyDiesel: 0,
+          amountDiesel: 0,
+          totalAmount: 0,
+          cash: 0,
+          bank: 0,
+          total: 0
+        };
+      }
+
+      // Aggregate the data by fuel type
+      switch (fuel_type) {
+        case "91":
+          acc[dateKey].qty91 += total_qty;
+          acc[dateKey].amount91 += total_amt;
+          break;
+        case "95":
+          acc[dateKey].qty95 += total_qty;
+          acc[dateKey].amount95 += total_amt;
+          break;
+        case "Diesel":
+          acc[dateKey].qtyDiesel += total_qty;
+          acc[dateKey].amountDiesel += total_amt;
+          break;
+        default:
+          break;
+      }
+
+      // Aggregate total amount
+      acc[dateKey].totalAmount += total_amt;
+
+      return acc;
+    }, {});
+
+    // Convert the object into an array
+    const resultArray = Object.values(processedData);
+
+    // Send the processed result as the response
     res.status(200).json({
       success: true,
-      data: result,
+      data: resultArray,
     });
   });
 };
+
 
 
 
