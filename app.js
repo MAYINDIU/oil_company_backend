@@ -68,6 +68,10 @@ const routes = [
     path: "/api/otherexp-amount",
     route: require("./modules/StationOthersExpense/StationOthersExpense.route"),
   },
+  {
+    path: "/api",
+    route: require("./modules/Shabaka/Shabaka.route"),
+  },
 ];
 
 routes.forEach(({ path, route }) => app.use(path, route));
