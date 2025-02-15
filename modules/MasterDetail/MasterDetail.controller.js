@@ -221,11 +221,96 @@ const getPrevReadingData = (req, res) => {
   });
 };
 
+
+const getSingleMdetaildata = (req, res) => {
+  const { id} = req.query;
+
+  // Call the service to get previous reading
+  masterModel.getSinglemDetails(id, (err, result) => {
+    if (err) {
+      return res.status(500).json({ error: "Internal server error", details: err });
+    }
+
+    if (result.message) {
+      return res.status(404).json(result); // No previous reading found
+    }
+
+    return res.status(201).json({
+      success: true,
+      previousReading: result, // Send the reading as response
+    });
+  });
+};
+
+
+
+
+
+const updateMasterSingleDetail = async (req, res) => {
+  try {
+    const {
+      id, // The ID of the record to update
+      station_id,
+      fuel_type,
+      torambo_no,
+      previous_reading,
+      present_reading,
+      sale_unit,
+    } = req.body;
+
+    // Calculate the addition (5% of sale_unit)
+    const addCalculation = (sale_unit * 5) / 100;
+
+    // Prepare data for updating
+    const updateData = {
+      station_id,
+      fuel_type,
+      torambo_no,
+      previous_reading,
+      present_reading,
+      sale_unit,
+      addition: addCalculation || 0, // Default to 0 if calculation fails
+    };
+
+    // Check if id is provided
+    if (!id) {
+      return res.status(400).json({ error: "ID is required to update the record" });
+    }
+
+    // Call the model to update the record
+    masterModel.updateMasterSingleData(id, updateData, (err, result) => {
+      if (err) {
+        return res.status(500).json({ error: "Internal Server Error" });
+      }
+
+      // If no rows are affected, return a 404 error
+      if (result.affectedRows === 0) {
+        return res.status(404).json({ error: "Record not found" });
+      }
+
+      // Successfully updated the record
+      res.status(200).json({
+        success: true,
+        message: "Master detail updated successfully",
+        id: id,
+      });
+    });
+  } catch (error) {
+    console.error("Unexpected error:", error);
+    res.status(500).json({ error: error.message });
+  }
+};
+
+
+
+
 module.exports = {
   createMasterDetail,
   getSingleMdetail,
   createOrUpdateMasterData,
   getFueltypeMdetail,
   getPreviousReadings,
-  getPrevReadingData
+  getPrevReadingData,
+  getSingleMdetaildata,
+  updateMasterSingleDetail
 };

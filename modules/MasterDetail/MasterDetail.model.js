@@ -185,10 +185,6 @@ const updateMasterDatas = (
 
 
 
-
-
-
-
 const getPrevReading = (station_id, fuel_type, torambo_no, tr_date, callback) => {
   const query = `SELECT present_reading as Prv_reading 
     FROM m_detail
@@ -214,6 +210,55 @@ const getPrevReading = (station_id, fuel_type, torambo_no, tr_date, callback) =>
 
 
 
+const getSinglemDetails = (id, callback) => {
+  const query = `SELECT * 
+FROM m_detail md
+JOIN branch b ON b.branch_id = md.station_id
+WHERE md.id = ?`;
+
+  db.query(query, [id], (err, results) => {
+    if (err) {
+      console.error("Error fetching single m_detail data:", err);
+      return callback(err, null);
+    }
+
+    if (results.length === 0) {
+      return callback(null, { message: "No previous single reading found." });
+    }
+
+    callback(null, results[0]);
+  });
+};
+
+// Update Master single Data
+const updateMasterSingleData = (id, updateData, callback) => {
+  const { station_id, fuel_type, torambo_no, previous_reading, present_reading, sale_unit, addition } = updateData;
+  const query = `
+    UPDATE m_detail
+    SET 
+      station_id = ?, 
+      fuel_type = ?, 
+      torambo_no = ?, 
+      previous_reading = ?, 
+      present_reading = ?, 
+      sale_unit = ?, 
+      addition = ?
+    WHERE id = ?;
+  `;
+
+  db.query(query, [station_id, fuel_type, torambo_no, previous_reading, present_reading, sale_unit, addition, id], (err, result) => {
+    if (err) {
+      console.error("Error executing query:", err);
+      return callback(err, null);
+    }
+    callback(null, result);
+  });
+};
+
+
+
+
+
 
 
 
@@ -228,5 +273,7 @@ module.exports = {
   getFueltypeMDetail,
   getPreviousReading,
   updateMasterDatas,
-  getPrevReading
+  getPrevReading,
+  getSinglemDetails,
+  updateMasterSingleData
 };
