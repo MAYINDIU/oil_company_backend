@@ -97,9 +97,41 @@ const getTotalExpensebystation = (req, res) => {
   );
 };
 
+
+
+
+
+
+//STATION AND TR DATE WISE 
+const getStationExpenseByStationdate = (req, res) => {
+  const { station_id,tr_date } = req.query; // Get station_id from URL parameters
+
+  if (!station_id) {
+    return res.status(400).json({ error: "Station ID is required" });
+  }
+
+  // Call the model function
+  stationExpenseModel.getAllstationExpensebystationDate(
+    station_id,tr_date,
+    (err, results) => {
+      if (err) {
+        console.error("Error fetching station expenses:", err);
+        return res.status(500).json({ error: "Internal Server Error" });
+      }
+
+      res.status(200).json({
+        success: true,
+        message: "Fetched station expenses list successfully",
+        data: results,
+      });
+    }
+  );
+};
+
 module.exports = {
   createStationExpense,
   getAllExpenseAmounts,
   getStationExpenseByStationId,
   getTotalExpensebystation,
+  getStationExpenseByStationdate
 };

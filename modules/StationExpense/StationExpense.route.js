@@ -16,4 +16,9 @@ router.get(
   stationController.getTotalExpensebystation
 );
 
+router.get(
+  "/stationdatewiseexpense",
+  stationController.getStationExpenseByStationdate
+);
+
 module.exports = router;

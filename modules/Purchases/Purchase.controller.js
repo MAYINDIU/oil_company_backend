@@ -38,10 +38,13 @@ const getStationwiseLedgerreport = (req, res) => {
           station_name, // Add the station_name here
           qty91: 0,
           amount91: 0,
+          rate91: 0,    // Add rate91
           qty95: 0,
           amount95: 0,
+          rate95: 0,    // Add rate95
           qtyDiesel: 0,
           amountDiesel: 0,
+          rateDiesel: 0, // Add rateDiesel
           totalAmount: 0,
           total_quantity: 0 // Initialize the total quantity
         };
@@ -71,7 +74,26 @@ const getStationwiseLedgerreport = (req, res) => {
       // Calculate the total quantity (sum of qty91, qty95, and qtyDiesel)
       acc[dateKey].total_quantity = acc[dateKey].qty91 + acc[dateKey].qty95 + acc[dateKey].qtyDiesel;
 
-      // Calculate the rate (totalAmount / total_quantity), if total_quantity is not 0
+      // Calculate the rate for each fuel type
+      if (acc[dateKey].qty91 > 0) {
+        acc[dateKey].rate91 = (acc[dateKey].amount91 / acc[dateKey].qty91).toFixed(2);
+      } else {
+        acc[dateKey].rate91 = 0; // Avoid division by zero
+      }
+
+      if (acc[dateKey].qty95 > 0) {
+        acc[dateKey].rate95 = (acc[dateKey].amount95 / acc[dateKey].qty95).toFixed(2);
+      } else {
+        acc[dateKey].rate95 = 0; // Avoid division by zero
+      }
+
+      if (acc[dateKey].qtyDiesel > 0) {
+        acc[dateKey].rateDiesel = (acc[dateKey].amountDiesel / acc[dateKey].qtyDiesel).toFixed(2);
+      } else {
+        acc[dateKey].rateDiesel = 0; // Avoid division by zero
+      }
+
+      // Calculate the total rate (totalAmount / total_quantity), if total_quantity is not 0
       if (acc[dateKey].total_quantity > 0) {
         acc[dateKey].rate = (acc[dateKey].totalAmount / acc[dateKey].total_quantity).toFixed(2);
       } else {
@@ -91,7 +113,6 @@ const getStationwiseLedgerreport = (req, res) => {
     });
   });
 };
-
 
 
 

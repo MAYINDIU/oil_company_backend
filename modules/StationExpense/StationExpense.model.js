@@ -81,9 +81,40 @@ function createExpenseamount(user, callback) {
   });
 }
 
+
+
+//station and date wise all expense list
+function getAllstationExpensebystationDate(station_id,tr_date, callback) {
+  const query = `
+    SELECT 
+      station_expense.expense_id,
+      station_expense.station_id,
+      branch.branch_name,
+      station_expense.expitem_id,
+      expense_item.expense_name,
+      station_expense.amount,
+      station_expense.remarks,
+      station_expense.created_date,
+      station_expense.updated_date
+    FROM station_expense
+    JOIN branch ON station_expense.station_id = branch.branch_id
+    JOIN expense_item ON station_expense.expitem_id = expense_item.exp_id
+    WHERE station_expense.station_id = ? AND station_expense.tr_date=?
+  `;
+
+  db.query(query, [station_id,tr_date], (err, results) => {
+    if (err) {
+      callback(err, null);
+    } else {
+      callback(null, results);
+    }
+  });
+}
+
 module.exports = {
   createExpenseamount,
   getAllstationExpense,
   getAllstationExpensebystationid,
   getTotalExpenseByStation,
+  getAllstationExpensebystationDate
 };
