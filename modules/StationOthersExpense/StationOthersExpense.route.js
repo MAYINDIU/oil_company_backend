@@ -15,4 +15,21 @@ router.get(
   stationController.getTotalExpensebystation
 );
 
+router.get(
+  "/stationdatewiseexpense",
+  stationController.getOthersExpenseByStationdate
+);
+
+router.get(
+  "/stationSingleDetails",
+  stationController.getStationSingleExpense
+);
+
+
+
+router.put('/updatesingle-othersexpense', stationController.updateSingleStationExpense);
+
+
+
+
 module.exports = router;
