@@ -97,9 +97,112 @@ const getTotalExpensebystation = (req, res) => {
   );
 };
 
+
+
+
+
+
+//STATION AND TR DATE WISE 
+const getStationExpenseByStationdate = (req, res) => {
+  const { station_id,tr_date } = req.query; // Get station_id from URL parameters
+
+  if (!station_id) {
+    return res.status(400).json({ error: "Station ID is required" });
+  }
+  // Call the model function
+  stationExpenseModel.getAllstationExpensebystationDate(
+    station_id,tr_date,
+    (err, results) => {
+      if (err) {
+        console.error("Error fetching station expenses:", err);
+        return res.status(500).json({ error: "Internal Server Error" });
+      }
+
+      res.status(200).json({
+        success: true,
+        message: "Fetched station expenses list successfully",
+        data: results,
+      });
+    }
+  );
+};
+
+
+//single expense details
+const getStationSingleExpense = (req, res) => {
+  const { expense_id} = req.query; // expense_id
+
+  if (!expense_id) {
+    return res.status(400).json({ error: "expense_id  is required" });
+  }
+  // Call the model function
+  stationExpenseModel.getStationSingleExpense(
+    expense_id,
+    (err, results) => {
+      if (err) {
+        console.error("Error fetching expense_id wise expenses:", err);
+        return res.status(500).json({ error: "Internal Server Error" });
+      }
+
+      res.status(200).json({
+        success: true,
+        message: "Fetched single station expenses  successfully",
+        data: results,
+      });
+    }
+  );
+};
+
+
+const updateSingleStationExpense = async (req, res) => {
+  try {
+    const { expense_id, station_id, expitem_id, amount, remarks, tr_date } = req.body;
+
+    // Prepare the data to be updated
+    const updateData = {
+      expense_id,
+      station_id,
+      expitem_id,
+      amount,
+      remarks,
+      tr_date,
+    };
+
+    // Call the model to update the data
+    stationExpenseModel.updateSingleExpense(updateData, (err, result) => {
+      if (err) {
+        console.error("Error updating station expense data:", err);
+        return res.status(500).json({ error: "Internal Server Error" });
+      }
+
+      // If no rows were affected, the record may not have been found
+      if (result.affectedRows === 0) {
+        return res.status(204).json({ error: "Expense not found" });
+      }
+
+      // Send success response
+      res.status(201).json({
+        success: true,
+        message: "Station expense updated successfully",
+        updatedId: expense_id, // The ID of the updated expense
+      });
+    });
+  } catch (error) {
+    // Handle unexpected errors
+    console.error("Unexpected error:", error);
+    res.status(500).json({ error: error.message });
+  }
+};
+
+
+
+
 module.exports = {
   createStationExpense,
   getAllExpenseAmounts,
   getStationExpenseByStationId,
   getTotalExpensebystation,
+  getStationExpenseByStationdate,
+  getStationSingleExpense,
+  updateSingleStationExpense
 };

@@ -81,9 +81,107 @@ function createExpenseamount(user, callback) {
   });
 }
 
+//station and date wise all expense list
+function getAllstationExpensebystationDate(station_id,tr_date, callback) {
+  const query = `
+    SELECT 
+      station_expense.expense_id,
+      station_expense.station_id,
+      branch.branch_name,
+      station_expense.expitem_id,
+      expense_item.expense_name,
+      station_expense.amount,
+      station_expense.remarks,
+      station_expense.created_date,
+      station_expense.updated_date
+    FROM station_expense
+    JOIN branch ON station_expense.station_id = branch.branch_id
+    JOIN expense_item ON station_expense.expitem_id = expense_item.exp_id
+    WHERE station_expense.station_id = ? AND station_expense.tr_date=?
+  `;
+
+  db.query(query, [station_id,tr_date], (err, results) => {
+    if (err) {
+      callback(err, null);
+    } else {
+      callback(null, results);
+    }
+  });
+}
+
+
+function getStationSingleExpense(expense_id , callback) {
+  const query = `
+    SELECT 
+      station_expense.expense_id,
+      station_expense.tr_date,
+      station_expense.station_id,
+      branch.branch_name,
+      station_expense.expitem_id,
+      expense_item.expense_name,
+      station_expense.amount,
+      station_expense.remarks,
+      station_expense.created_date,
+      station_expense.updated_date
+    FROM station_expense
+    JOIN branch ON station_expense.station_id = branch.branch_id
+    JOIN expense_item ON station_expense.expitem_id = expense_item.exp_id
+    WHERE station_expense.expense_id =?
+  `;
+
+  db.query(query, [expense_id], (err, results) => {
+    if (err) {
+      callback(err, null);
+    } else {
+      callback(null, results);
+    }
+  });
+}
+
+
+
+const updateSingleExpense = (data, callback) => {
+  const { expense_id, station_id, expitem_id, amount, remarks, tr_date } = data;
+
+  const query = `
+    UPDATE station_expense 
+    SET 
+      station_id = ?, 
+      expitem_id = ?, 
+      amount = ?, 
+      remarks = ?, 
+      tr_date = ?, 
+      updated_date = NOW() 
+    WHERE expense_id = ?
+  `;
+
+  const values = [station_id, expitem_id, amount, remarks, tr_date, expense_id];
+
+  db.query(query, values, (err, result) => {
+    if (err) {
+      console.error("Error updating station expense data:", err);
+      return callback(err, null);
+    }
+    return callback(null, result);
+  });
+};
+
+
+
+
+
+
+
+
+
+
+
 module.exports = {
   createExpenseamount,
   getAllstationExpense,
   getAllstationExpensebystationid,
   getTotalExpenseByStation,
+  getAllstationExpensebystationDate,
+  getStationSingleExpense,
+  updateSingleExpense
 };
