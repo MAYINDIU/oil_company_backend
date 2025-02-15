@@ -304,6 +304,31 @@ const updateMasterSingleDetail = async (req, res) => {
 
 
 
+const MDetailBackupDelete = (req, res) => {
+  const { id} = req.params;
+  console.log(id)
+
+  // Call the service to get previous reading
+  masterModel.MdetailbackupAndDelete(id, (err, result) => {
+    if (err) {
+      // If there is an error, respond with an error message
+      return res.status(500).json({ success: false, message: "Error during backup and delete", error: err.message });
+    }
+
+    // On success, send a success message
+    return res.status(200).json({
+      success: true,
+      message: "Record backed up and deleted successfully",
+      data: result,
+    });
+  });
+};
+
+
+
+
+
+
 module.exports = {
   createMasterDetail,
   getSingleMdetail,
@@ -312,5 +337,6 @@ module.exports = {
   getPreviousReadings,
   getPrevReadingData,
   getSingleMdetaildata,
-  updateMasterSingleDetail
+  updateMasterSingleDetail,
+  MDetailBackupDelete
 };

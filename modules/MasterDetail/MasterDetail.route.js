@@ -16,5 +16,9 @@ router.get("/single-mdetail-data", mdetilController.getSingleMdetaildata);
 
 router.put('/updateMasterSingleDetail', mdetilController.updateMasterSingleDetail);
 
+router.put('/updateMasterSingleDetail', mdetilController.updateMasterSingleDetail);
+
+router.get('/m_detail-backupdelete/:id', mdetilController.MDetailBackupDelete);
+
 
 module.exports = router;
