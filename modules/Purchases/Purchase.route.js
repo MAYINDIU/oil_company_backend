@@ -13,4 +13,14 @@ router.get(
   purchaserateController.getTotalExpensebystation
 );
 
+router.get(
+  "/supplier_wise_ledger_report",
+  purchaserateController.getLedgerReport
+);
+
+
+router.get(
+  "/station_wise_ledger_report",
+  purchaserateController.getStationwiseLedgerreport
+);
 module.exports = router;
