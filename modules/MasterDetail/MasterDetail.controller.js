@@ -94,6 +94,7 @@ const createMasterDetail = async (req, res) => {
       previous_reading,
       present_reading,
       sale_unit,
+      tr_date
     } = req.body;
 
     const addCalculation = (sale_unit * 5) / 100;
@@ -106,6 +107,7 @@ const createMasterDetail = async (req, res) => {
       previous_reading,
       present_reading,
       sale_unit,
+      tr_date,
       addition: addCalculation || 0, // Default addition to 0 if not provided
     };
 

@@ -187,7 +187,7 @@ function getStationSingleExpense(expense_id , callback) {
 }
 
 
-
+//update station wise expense
 const updateSingleExpense = (data, callback) => {
   const { expense_id, station_id, expitem_id, amount, remarks, tr_date } = data;
 
