@@ -6,6 +6,7 @@ const router = express.Router();
 // Prefix all routes with '/api'
 router.get("/all-expense-amount", stationController.getAllExpenseAmounts);
 router.get("/station-expense-report", stationController.getAllStationExpReport);
+router.get("/station-expense-ledger", stationController.getAllStationExpReportLedger);
 router.post("/create-expense-amount", stationController.createStationExpense);
 router.get(
   "/station-expense/:station_id",

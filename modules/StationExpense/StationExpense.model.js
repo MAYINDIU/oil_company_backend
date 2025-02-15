@@ -56,6 +56,28 @@ function allStationExp(station_id, fromDate, toDate, callback) {
       FROM station_expense s
       JOIN expense_item exp ON s.expitem_id  = exp.exp_id
       WHERE s.station_id = ? AND  s.tr_date >= ? AND s.tr_date <= ?
+      ORDER BY exp.expense_name,s.tr_date ASC
+  `;
+
+  db.query(query, [station_id, fromDate, toDate], (err, results) => {
+    if (err) {
+      console.error("Error fetching toromba data:", err);
+      return callback(err, null);
+    }
+    callback(null, results);
+  });
+}
+
+function allStationExpLedger(station_id, fromDate, toDate, callback) {
+  let query = `
+      SELECT 
+          s.expitem_id,
+          SUM(s.amount) AS total_amount,
+          exp.expense_name
+      FROM station_expense s
+      JOIN expense_item exp ON s.expitem_id  = exp.exp_id
+      WHERE s.station_id = ? AND  s.tr_date >= ? AND s.tr_date <= ?
+      GROUP BY s.expitem_id, exp.expense_name
       ORDER BY exp.expense_name ASC
   `;
 
@@ -111,6 +133,7 @@ module.exports = {
   createExpenseamount,
   getAllstationExpense,
   allStationExp,
+  allStationExpLedger,
   getAllstationExpensebystationid,
   getTotalExpenseByStation,
 };
