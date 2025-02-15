@@ -100,6 +100,27 @@ function getAllStationExpReport(req, res) {
   );
 }
 
+function getAllStationExpReportLedger(req, res) {
+  const { station_id, fromDate, toDate } = req.query;
+  stationExpenseModel.allStationExpLedger(
+    station_id,
+    fromDate,
+    toDate,
+    (err, expData) => {
+      if (err) {
+        res.status(500).json({ error: err.message });
+      } else {
+        sendResponse(res, {
+          statusCode: 200,
+          success: true,
+          message: "Fetched all Toromba successfully",
+          data: expData,
+        });
+      }
+    }
+  );
+}
+
 const getTotalExpensebystation = (req, res) => {
   const { station_id, exp_date } = req.params; // Get the station_id from the request parameters
 
@@ -122,6 +143,7 @@ module.exports = {
   createStationExpense,
   getAllExpenseAmounts,
   getAllStationExpReport,
+  getAllStationExpReportLedger,
   getStationExpenseByStationId,
   getTotalExpensebystation,
 };
