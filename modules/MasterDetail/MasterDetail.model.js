@@ -258,7 +258,50 @@ const updateMasterSingleData = (id, updateData, callback) => {
 
 
 
+const MdetailbackupAndDelete = (id, callback) => {
+  // Begin transaction
+  db.beginTransaction((err) => {
+    if (err) {
+      console.error("Error starting transaction:", err);
+      return callback(err, null);
+    }
 
+    // Insert data into backup table
+    const insertQuery = `INSERT INTO m_detail_backup SELECT * FROM m_detail WHERE id = ?`;
+    db.query(insertQuery, [id], (err, result) => {
+      if (err) {
+        return db.rollback(() => {
+          console.error("Error during insert:", err);
+          callback(err, null);
+        });
+      }
+
+      // Delete the original data from m_detail
+      const deleteQuery = `DELETE FROM m_detail WHERE id = ?`;
+      db.query(deleteQuery, [id], (err, result) => {
+        if (err) {
+          return db.rollback(() => {
+            console.error("Error during delete:", err);
+            callback(err, null);
+          });
+        }
+
+        // Commit the transaction if everything is successful
+        db.commit((err) => {
+          if (err) {
+            return db.rollback(() => {
+              console.error("Error during commit:", err);
+              callback(err, null);
+            });
+          }
+
+          // Everything went fine, return success
+          callback(null, result);
+        });
+      });
+    });
+  });
+};
 
 
 
@@ -275,5 +318,6 @@ module.exports = {
   updateMasterDatas,
   getPrevReading,
   getSinglemDetails,
-  updateMasterSingleData
+  updateMasterSingleData,
+  MdetailbackupAndDelete
 };
