@@ -1,34 +1,55 @@
 const db = require("../../config/db.js");
 const dotenv = require("dotenv");
 
-// const getTotalPurchaseByStation = (
-//   station_id,
-//   tr_date,
-//   fuel_type,
-//   callback
-// ) => {
-//   const query = `SELECT
-//     b.branch_id,
-//     b.branch_name,
-//     SUM(pr.total_qty) AS total_quantity,
-//     SUM(pr.total_amt) AS total_amount,
-//     SUM(pr.no_truck) AS total_trucks
-// FROM purchase_rate pr
-// JOIN branch b ON pr.station_id = b.branch_id
-// WHERE
-//     pr.station_id = ?
-//     AND pr.tr_date = ?
-//     AND pr.fuel_type = ?
-// GROUP BY b.branch_id, b.branch_name`;
 
-//   db.query(query, [station_id, tr_date, fuel_type], (err, result) => {
-//     if (err) {
-//       console.error("Error fetching total expense:", err);
-//       return callback(err, null);
-//     }
-//     callback(null, result);
-//   });
-// };
+
+const getStationwiseLedger = (from_date, to_date, station_id, callback) => {
+  const query = `SELECT
+    pr.tr_date,
+    pr.fuel_type,
+    SUM(pr.total_qty) AS total_qty,
+    SUM(pr.total_amt) AS total_amt,
+    b.branch_name AS station_name,
+    s.supplier_name
+FROM purchase_rate pr
+JOIN branch b ON b.branch_id = pr.station_id
+JOIN suppliers s ON s.supplier_id = pr.supplier_id
+WHERE pr.tr_date BETWEEN ? AND ?
+AND pr.station_id = ?
+GROUP BY pr.tr_date, pr.fuel_type
+ORDER BY pr.tr_date, pr.fuel_type`;
+
+  db.query(query, [from_date, to_date, station_id], (err, result) => {
+    if (err) {
+      console.error("Error fetching total expense:", err);
+      return callback(err, null);
+    }
+    callback(null, result);
+  });
+};
+
+const getSupplierwiseLedger = (from_date, to_date, supplier_id, callback) => {
+  const query = ` SELECT
+      pr.total_qty,
+      pr.total_amt,
+      pr.fuel_type,
+      pr.tr_date,
+      b.branch_name AS station_name,
+      s.supplier_name
+  FROM purchase_rate pr
+  JOIN branch b ON b.branch_id = pr.station_id
+  JOIN suppliers s ON s.supplier_id = pr.supplier_id
+  WHERE pr.tr_date BETWEEN ? AND ?
+  AND pr.supplier_id = ?`;
+
+  db.query(query, [from_date, to_date, supplier_id], (err, result) => {
+    if (err) {
+      console.error("Error fetching total expense:", err);
+      return callback(err, null);
+    }
+    callback(null, result);
+  });
+};
 
 const getTotalPurchaseByStation = (station_id, tr_date, callback) => {
   const query = `SELECT
@@ -38,17 +59,16 @@ const getTotalPurchaseByStation = (station_id, tr_date, callback) => {
     SUM(pr.no_truck) AS total_trucks,
     b.branch_name,
     s.supplier_name
-FROM purchase_rate pr
-LEFT JOIN branch b ON pr.station_id = b.branch_id
-LEFT JOIN suppliers s ON pr.supplier_id = s.supplier_id
-WHERE
-    pr.station_id = ?  
-    AND pr.tr_date = ?  
-GROUP BY 
-    pr.fuel_type, b.branch_name, pr.station_id, s.supplier_name
-ORDER BY 
-    pr.fuel_type
-`;
+    FROM purchase_rate pr
+    LEFT JOIN branch b ON pr.station_id = b.branch_id
+    LEFT JOIN suppliers s ON pr.supplier_id = s.supplier_id
+    WHERE
+        pr.station_id = ?  
+        AND pr.tr_date = ?  
+    GROUP BY 
+        pr.fuel_type, b.branch_name, pr.station_id, s.supplier_name
+    ORDER BY 
+        pr.fuel_type`;
 
   db.query(query, [station_id, tr_date], (err, result) => {
     if (err) {
@@ -114,4 +134,6 @@ module.exports = {
   getAllPurchaseRate,
   updatePurchase,
   getTotalPurchaseByStation,
+  getSupplierwiseLedger,
+  getStationwiseLedger
 };

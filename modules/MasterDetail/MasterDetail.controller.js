@@ -10,7 +10,6 @@ const createOrUpdateMasterData = (req, res) => {
     previous_reading,
     present_reading,
     sale_unit,
-    tr_date,
   } = req.body;
 
   // if (
@@ -70,7 +69,6 @@ const createOrUpdateMasterData = (req, res) => {
           previous_reading: present_reading,
           present_reading,
           sale_unit: present_reading - previous_reading,
-          tr_date,
         };
 
         masterModel.insertMasterData(newRecord, (insertErr, insertResults) => {
@@ -96,11 +94,10 @@ const createMasterDetail = async (req, res) => {
       previous_reading,
       present_reading,
       sale_unit,
-      tr_date,
-      rate,
+      tr_date
     } = req.body;
 
-    const addCalculation = (sale_unit * rate) / 100;
+    const addCalculation = (sale_unit * 5) / 100;
 
     // Prepare data for insertion
     const saveData = {
@@ -110,24 +107,21 @@ const createMasterDetail = async (req, res) => {
       previous_reading,
       present_reading,
       sale_unit,
-      addition: addCalculation || 0,
-      tr_date: tr_date, // Default addition to 0 if not provided
+      tr_date,
+      addition: addCalculation || 0, // Default addition to 0 if not provided
     };
 
+    // Insert into database
     masterModel.createMasterData(saveData, (err, result) => {
       if (err) {
-        // If an error occurs (either a database error or a duplicate record)
-        return res.status(200).json({
-          success: false,
-          message: err || "Failed to create the record",
-        });
+        console.error("Error inserting master detail reading:", err);
+        return res.status(500).json({ error: "Internal Server Error" });
       }
 
-      // If the record was successfully created
-      return res.status(200).json({
+      res.status(201).json({
         success: true,
-        message: "Master detail created successfully",
-        data: result,
+        message: "Master detail  created successfully",
+        id: result.insertId,
       });
     });
   } catch (error) {
@@ -174,13 +168,11 @@ const getFueltypeMdetail = (req, res) => {
         console.error("Error fetching toromba data:", err);
         return res.status(500).json({ error: "Internal Server Error" });
       }
-
       if (results.length === 0) {
         return res
           .status(201)
           .json({ message: "No toromba records found for the specified date" });
       }
-
       res.status(200).json(results);
     }
   );
@@ -210,51 +202,134 @@ const getPreviousReadings = (req, res) => {
   );
 };
 
-const updateReading = async (req, res) => {
+
+const getPrevReadingData = (req, res) => {
+  const { station_id, fuel_type, torambo_no, tr_date } = req.query;
+
+  // Call the service to get previous reading
+  masterModel.getPrevReading(station_id, fuel_type, torambo_no, tr_date, (err, result) => {
+    if (err) {
+      return res.status(500).json({ error: "Internal server error", details: err });
+    }
+
+    if (result.message) {
+      return res.status(404).json(result); // No previous reading found
+    }
+
+    return res.status(201).json({
+      success: true,
+      previousReading: result, // Send the reading as response
+    });
+  });
+};
+
+
+const getSingleMdetaildata = (req, res) => {
+  const { id} = req.query;
+
+  // Call the service to get previous reading
+  masterModel.getSinglemDetails(id, (err, result) => {
+    if (err) {
+      return res.status(500).json({ error: "Internal server error", details: err });
+    }
+
+    if (result.message) {
+      return res.status(404).json(result); // No previous reading found
+    }
+
+    return res.status(201).json({
+      success: true,
+      previousReading: result, // Send the reading as response
+    });
+  });
+};
+
+
+
+
+
+const updateMasterSingleDetail = async (req, res) => {
   try {
     const {
-      updatedPreviousReading,
-      present_reading,
+      id, // The ID of the record to update
       station_id,
       fuel_type,
       torambo_no,
+      previous_reading,
+      present_reading,
+      sale_unit,
     } = req.body;
 
-    if (
-      !updatedPreviousReading ||
-      !present_reading ||
-      !station_id ||
-      !fuel_type ||
-      !torambo_no
-    ) {
-      return res.status(400).json({ message: "All fields are required" });
+    // Calculate the addition (5% of sale_unit)
+    const addCalculation = (sale_unit * 5) / 100;
+
+    // Prepare data for updating
+    const updateData = {
+      station_id,
+      fuel_type,
+      torambo_no,
+      previous_reading,
+      present_reading,
+      sale_unit,
+      addition: addCalculation || 0, // Default to 0 if calculation fails
+    };
+
+    // Check if id is provided
+    if (!id) {
+      return res.status(400).json({ error: "ID is required to update the record" });
     }
 
-    console.log(
-      updatedPreviousReading,
-      present_reading,
-      station_id,
-      fuel_type,
-      torambo_no
-    );
+    // Call the model to update the record
+    masterModel.updateMasterSingleData(id, updateData, (err, result) => {
+      if (err) {
+        return res.status(500).json({ error: "Internal Server Error" });
+      }
 
-    // Call model function with a promise
-    const result = await masterModel.updateMasterDatas(
-      updatedPreviousReading,
-      present_reading,
-      station_id,
-      fuel_type,
-      torambo_no
-    );
+      // If no rows are affected, return a 404 error
+      if (result.affectedRows === 0) {
+        return res.status(404).json({ error: "Record not found" });
+      }
 
-    return res
-      .status(200)
-      .json({ message: "Data updated successfully", result });
-  } catch (err) {
-    console.error("Error updating master data:", err);
-    return res.status(500).json({ message: "Internal server error" });
+      // Successfully updated the record
+      res.status(200).json({
+        success: true,
+        message: "Master detail updated successfully",
+        id: id,
+      });
+    });
+  } catch (error) {
+    console.error("Unexpected error:", error);
+    res.status(500).json({ error: error.message });
   }
 };
+
+
+
+
+const MDetailBackupDelete = (req, res) => {
+  const { id} = req.params;
+  console.log(id)
+
+  // Call the service to get previous reading
+  masterModel.MdetailbackupAndDelete(id, (err, result) => {
+    if (err) {
+      // If there is an error, respond with an error message
+      return res.status(500).json({ success: false, message: "Error during backup and delete", error: err.message });
+    }
+
+    // On success, send a success message
+    return res.status(200).json({
+      success: true,
+      message: "Record backed up and deleted successfully",
+      data: result,
+    });
+  });
+};
+
+
+
+
+
 
 module.exports = {
   createMasterDetail,
@@ -262,5 +337,8 @@ module.exports = {
   createOrUpdateMasterData,
   getFueltypeMdetail,
   getPreviousReadings,
-  updateReading,
+  getPrevReadingData,
+  getSingleMdetaildata,
+  updateMasterSingleDetail,
+  MDetailBackupDelete
 };

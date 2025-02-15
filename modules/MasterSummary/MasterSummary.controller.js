@@ -69,8 +69,47 @@ const getPreviousStk = (req, res) => {
   });
 };
 
+const getFuelSummary = async (req, res) => {
+  try {
+    const { stationId, fromDate, toDate } = req.query;
+
+      // Check if all required parameters are provided
+      if (!stationId || !fromDate || !toDate) {
+          return res.status(400).json({ message: "stationId, fromDate, and toDate are required." });
+      }
+
+      // Fetch data from the model
+      const data = await mastersummaryModel.getFuelSummary(stationId, fromDate, toDate);
+      
+      res.status(200).json(data);
+  } catch (error) {
+      res.status(500).json({ message: "Server Error", error: error.message });
+  }
+};
+
+
+const getDatewiseFuelSummary = async (req, res) => {
+  try {
+      const {fromDate, toDate } = req.query;
+
+
+      // Fetch data from the model
+      const data = await mastersummaryModel.getDatewiseFuelSummary( fromDate, toDate);
+      
+      res.status(200).json(data);
+  } catch (error) {
+      res.status(500).json({ message: "Server Error", error: error.message });
+  }
+};
+
+
+
+
+
 module.exports = {
   createMasterSummaryDetail,
   createMasterSummary,
   getPreviousStk,
+  getFuelSummary,
+  getDatewiseFuelSummary
 };

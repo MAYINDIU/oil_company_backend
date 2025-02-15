@@ -204,6 +204,21 @@ const changePassword = catchAsync(async (req, res) => {
     });
 });
 
+const deleteUserById = async (req, res) => {
+  const { id } = req.params;
+  userModel.deleteUser(id, (err, affectedRows) => {
+    if (err) {
+      throw new ApiError(500, err.message);
+    } else {
+      sendResponse(res, {
+        statusCode: 200,
+        success: true,
+        message: "User Delete successfully",
+      });
+    }
+  });
+};
+
 module.exports = {
   getAllUsers,
   getSingleUser,
@@ -212,4 +227,5 @@ module.exports = {
   userCheckPassword,
   changePassword,
   login,
+  deleteUserById,
 };

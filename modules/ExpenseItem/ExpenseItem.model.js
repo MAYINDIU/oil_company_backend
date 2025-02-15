@@ -1,7 +1,7 @@
 const db = require("../../config/db.js");
 
 function getAllExpenseItem(callback) {
-  db.query("SELECT * FROM expense_item ", (err, results) => {
+  db.query("SELECT * FROM expense_item ORDER BY expense_name ", (err, results) => {
     if (err) {
       callback(err, null);
     } else {
