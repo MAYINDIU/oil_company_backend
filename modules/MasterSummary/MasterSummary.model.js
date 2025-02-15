@@ -73,6 +73,13 @@ const getFuelSummary = async (stationId, fromDate, toDate) => {
   SELECT 
     ds.tr_date,
 
+    
+
+    COALESCE(master_summary.total_stock_91, 0) AS closeing_blc_91,
+    COALESCE(master_summary.total_stock_95, 0) AS closeing_blc95,
+    COALESCE(master_summary.total_stock_diesel, 0) AS closeing_blc_diesel,
+
+
     COALESCE(prev_day.total_stock_91, 0) AS total_stock_91,
     COALESCE(prev_day.total_stock_95, 0) AS total_stock_95,
     COALESCE(prev_day.total_stock_diesel, 0) AS total_stock_diesel,
@@ -114,7 +121,7 @@ const getFuelSummary = async (stationId, fromDate, toDate) => {
   AND prev_day.tr_date = DATE_SUB(ds.tr_date, INTERVAL 1 DAY)
 
   GROUP BY ds.tr_date, prev_day.total_stock_91, prev_day.total_stock_95, prev_day.total_stock_diesel
-  ORDER BY ds.tr_date;`;
+  ORDER BY ds.tr_date`;
 
   const values = [fromDate, fromDate, toDate, stationId, stationId, stationId];
 
