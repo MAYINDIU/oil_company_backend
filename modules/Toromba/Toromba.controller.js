@@ -47,7 +47,8 @@ const createToromba = async (req, res) => {
 };
 
 function getAllToromba(req, res) {
-  torombaModel.getAllToromba((err, toromba) => {
+  const { station_id, fuel_type } = req.query;
+  torombaModel.getAllToromba(station_id, fuel_type, (err, toromba) => {
     if (err) {
       res.status(500).json({ error: err.message });
     } else {

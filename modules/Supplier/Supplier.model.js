@@ -1,7 +1,7 @@
 const db = require("../../config/db.js");
 
 function getAllSuppliers(callback) {
-  db.query("SELECT * FROM suppliers", (err, results) => {
+  db.query("SELECT * FROM suppliers ORDER BY supplier_name", (err, results) => {
     if (err) {
       callback(err, null);
     } else {
