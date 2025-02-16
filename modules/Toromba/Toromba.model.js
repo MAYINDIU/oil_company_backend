@@ -2,7 +2,7 @@ const db = require("../../config/db.js");
 
 // function getAllToromba(station_id,fuel_type,callback) {
 //   const query = `
-//         SELECT 
+//         SELECT
 //             t.toromba_id,
 //             t.station_id,
 //             t.rate,
@@ -59,7 +59,6 @@ function getAllToromba(station_id, fuel_type, callback) {
   });
 }
 
-
 function getSingleStationwiseToromba(station_id, fuel_type, callback) {
   const query = `
         SELECT 
@@ -75,7 +74,7 @@ function getSingleStationwiseToromba(station_id, fuel_type, callback) {
             b.branch_name
         FROM toromba t
         LEFT JOIN branch b ON t.station_id = b.branch_id
-        WHERE t.station_id = ? AND t.fuel_type = ?`; 
+        WHERE t.station_id = ? AND t.fuel_type = ?`;
   db.query(query, [station_id, fuel_type], (err, results) => {
     if (err) {
       console.error("Error fetching toromba data:", err);
@@ -99,20 +98,24 @@ function createToromba(toromba, callback) {
 }
 
 function updateToromba(toromba_id, data, callback) {
-  const updateQuery =
-    "UPDATE toromba  SET " +
-    Object.keys(data)
-      .map((key) => `${key} = ?`)
-      .join(", ") +
-    " WHERE toromba_id  = ?";
-  const updateValues = [...Object.values(data), toromba_id];
-  // console.log("User Service", updateQuery, updateValues);
-  db.query(updateQuery, updateValues, (err, rows) => {
+  const sql = "UPDATE toromba SET ? WHERE toromba_id = ?";
+  db.query(sql, [data, toromba_id], (err, rows) => {
     if (err) {
       callback(err, null);
       return;
     }
     callback(null, rows);
+  });
+}
+
+function deleteToromba(id, callback) {
+  const sql = "DELETE FROM toromba WHERE toromba_id = ?";
+  db.query(sql, [id], (err, rows) => {
+    if (err) {
+      callback(err, null);
+      return;
+    }
+    callback(null, rows.affectedRows);
   });
 }
 
@@ -137,5 +140,6 @@ module.exports = {
   createToromba,
   getAllToromba,
   updateToromba,
+  deleteToromba,
   getSingleStationwiseToromba,
 };

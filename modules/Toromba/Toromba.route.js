@@ -7,6 +7,7 @@ const router = express.Router();
 router.get("/all-toromba", torombaController.getAllToromba);
 router.post("/create-toromba", torombaController.createToromba);
 router.patch("/update-toromba/:toromba_id", torombaController.updateToromba);
+router.delete("/delete-toromba/:id", torombaController.deleteTorombaById);
 router.get("/toromba", torombaController.getSingleStationwiseToromba);
 
 router.get("/toromba-rate", torombaController.getToromboRate);

@@ -7,8 +7,8 @@ const getStationwiseLedger = (from_date, to_date, station_id, callback) => {
     pr.fuel_type,
     SUM(pr.total_qty) AS total_qty,
     SUM(pr.total_amt) AS total_amt,
-    b.branch_name AS station_name,
-    s.supplier_name
+    MAX(b.branch_name) AS station_name,
+    MAX(s.supplier_name) AS supplier_name
 FROM purchase_rate pr
 JOIN branch b ON b.branch_id = pr.station_id
 JOIN suppliers s ON s.supplier_id = pr.supplier_id
@@ -140,3 +140,18 @@ module.exports = {
   getSupplierwiseLedger,
   getStationwiseLedger,
 };
+
+// const query = `SELECT
+// pr.tr_date,
+// pr.fuel_type,
+// SUM(pr.total_qty) AS total_qty,
+// SUM(pr.total_amt) AS total_amt,
+// b.branch_name AS station_name,
+// s.supplier_name
+// FROM purchase_rate pr
+// JOIN branch b ON b.branch_id = pr.station_id
+// JOIN suppliers s ON s.supplier_id = pr.supplier_id
+// WHERE pr.tr_date BETWEEN ? AND ?
+// AND pr.station_id = ?
+// GROUP BY pr.tr_date, pr.fuel_type
+// ORDER BY pr.tr_date, pr.fuel_type`;

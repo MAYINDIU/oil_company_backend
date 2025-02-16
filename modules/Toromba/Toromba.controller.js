@@ -13,31 +13,38 @@ const createToromba = async (req, res) => {
       rate,
     } = req.body;
 
-    // Ensure all required fields are present
-    // if (!station_id || !fuel_type || !torombo_no || torombo_op_b === undefined || torombo_close_balance === undefined) {
-    //     return res.status(400).json({ error: 'Missing required fields' });
-    // }
-
-    const saveData = {
-      station_id,
-      fuel_type,
-      torombo_no,
-      torombo_op_b,
-      torombo_close_balance,
-      rate,
-    };
-
-    // Assuming torombaModel.createToromba is a function that accepts saveData and returns a Promise
-    torombaModel.createToromba(saveData, (err, result) => {
-      if (err) {
-        console.error("Error inserting Toromba data:", err);
-        return res.status(500).json({ error: "Internal Server Error" });
+    torombaModel.getAllToromba(station_id, fuel_type, (err, toromba) => {
+      const exists = toromba?.find(
+        (d) =>
+          d?.station_id == station_id &&
+          d?.fuel_type == fuel_type &&
+          d?.torombo_no == torombo_no
+      );
+      if (exists) {
+        return res.status(400).json({ error: "Already exists this toromba" });
       }
 
-      res.status(201).json({
-        success: true,
-        message: "Toromba created successfully",
-        torombaId: result.insertId, // Ensure your model returns `insertId`
+      const saveData = {
+        station_id,
+        fuel_type,
+        torombo_no,
+        torombo_op_b,
+        torombo_close_balance,
+        rate,
+      };
+      torombaModel.createToromba(saveData, (err, result) => {
+        if (err) {
+          console.error("Error inserting Toromba data:", err);
+          return res
+            .status(500)
+            .json({ error: "Internal Server Error", error: err?.sqlMessage });
+        }
+
+        res.status(201).json({
+          success: true,
+          message: "Toromba created successfully",
+          torombaId: result.insertId, // Ensure your model returns `insertId`
+        });
       });
     });
   } catch (error) {
@@ -111,6 +118,21 @@ const updateToromba = async (req, res) => {
   });
 };
 
+const deleteTorombaById = async (req, res) => {
+  const { id } = req.params;
+  torombaModel.deleteToromba(id, (err, affectedRows) => {
+    if (err) {
+      return res
+        .status(500)
+        .json({ error: "Failed to delete Data", error: err?.sqlMessage });
+    }
+    if (affectedRows === 0) {
+      return res.status(404).json({ error: "Data not found" });
+    }
+    res.json({ message: "Data deleted successfully" });
+  });
+};
+
 const getToromboRate = (req, res) => {
   const { station_id, fuel_type, torombo_no } = req.query; // Get parameters from query string
 
@@ -137,6 +159,7 @@ module.exports = {
   createToromba,
   getAllToromba,
   updateToromba,
+  deleteTorombaById,
   getSingleStationwiseToromba,
   getToromboRate,
 };
