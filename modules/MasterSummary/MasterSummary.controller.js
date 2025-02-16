@@ -49,13 +49,11 @@ const createMasterSummary = async (req, res) => {
 };
 
 const getPreviousStk = (req, res) => {
-  const { station_id } = req.query;
+  const { station_id,tr_date} = req.query;
 
-  if (!station_id) {
-    return res.status(400).json({ error: "station_id is required" });
-  }
 
-  mastersummaryModel.getLatestPreviousStock(station_id, (err, result) => {
+
+  mastersummaryModel.getLatestPreviousStock(station_id,tr_date, (err, result) => {
     if (err) {
       console.error("Database error:", err);
       return res.status(500).json({ error: "Internal Server Error" });
