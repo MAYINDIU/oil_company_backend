@@ -51,6 +51,8 @@ const getSupplierwiseLedger = (from_date, to_date, supplier_id, callback) => {
 
 const getTotalPurchaseByStation = (station_id, tr_date, callback) => {
   const query = `SELECT
+   pr.id,
+    pr.tr_date,
     pr.fuel_type,
     SUM(pr.total_qty) AS total_quantity,
     SUM(pr.total_amt) AS total_amount,
@@ -117,9 +119,10 @@ function updatePurchase(id, data, callback) {
     Object.keys(data)
       .map((key) => `${key} = ?`)
       .join(", ") +
-    " WHERE id = ?";
+    ", updated_date = NOW() WHERE id = ?";
+
   const updateValues = [...Object.values(data), id];
-  // console.log("User Service", updateQuery, updateValues);
+
   db.query(updateQuery, updateValues, (err, rows) => {
     if (err) {
       callback(err, null);

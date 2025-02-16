@@ -35,7 +35,7 @@ function getAllOtherExpensebystationDate(station_id, tr_date, callback) {
       others_exp.other_expe_id,
       others_exp.station_id,
       branch.branch_name,
-       expense_item.exp_id,
+      expense_item.exp_id,
       expense_item.expense_name,
       others_exp.amount,
       others_exp.remarks,
