@@ -35,7 +35,9 @@ const createToromba = async (req, res) => {
       torombaModel.createToromba(saveData, (err, result) => {
         if (err) {
           console.error("Error inserting Toromba data:", err);
-          return res.status(500).json({ error: "Internal Server Error" });
+          return res
+            .status(500)
+            .json({ error: "Internal Server Error", error: err?.sqlMessage });
         }
 
         res.status(201).json({

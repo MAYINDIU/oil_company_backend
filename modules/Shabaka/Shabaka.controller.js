@@ -21,7 +21,7 @@ exports.createData = (req, res) => {
         .status(500)
         .json({ error: "Failed to create Data", error: err?.sqlMessage });
     }
-    res.status(201).json({ id, message: "Data Created successfully" });
+    res.status(201).json({ id, message: "Shabaka Created successfully" });
   });
 };
 
