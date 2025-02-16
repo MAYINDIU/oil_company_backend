@@ -117,9 +117,10 @@ function updatePurchase(id, data, callback) {
     Object.keys(data)
       .map((key) => `${key} = ?`)
       .join(", ") +
-    " WHERE id = ?";
+    ", updated_date = NOW() WHERE id = ?";
+
   const updateValues = [...Object.values(data), id];
-  // console.log("User Service", updateQuery, updateValues);
+
   db.query(updateQuery, updateValues, (err, rows) => {
     if (err) {
       callback(err, null);
@@ -128,6 +129,7 @@ function updatePurchase(id, data, callback) {
     callback(null, rows);
   });
 }
+
 
 module.exports = {
   createPurchaseRate,

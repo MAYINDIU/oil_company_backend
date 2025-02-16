@@ -84,7 +84,7 @@ const getFuelSummary = async (req, res) => {
       
       res.status(200).json(data);
   } catch (error) {
-      res.status(500).json({ message: "Server Error", error: error.message });
+      res.status(204).json({ message: "Server Error", error: error.message });
   }
 };
 
