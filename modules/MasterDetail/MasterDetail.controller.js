@@ -108,7 +108,6 @@ const createMasterDetail = async (req, res) => {
       present_reading,
       sale_unit,
       tr_date,
-      // Additional field for calculation
       addition: addCalculation || 0, // Default addition to 0 if not provided
     };
 
