@@ -28,15 +28,14 @@ function createExpenseamount(user, callback) {
   });
 }
 
-
-
-function getAllOtherExpensebystationDate(station_id,tr_date, callback) {
+function getAllOtherExpensebystationDate(station_id, tr_date, callback) {
   const query = `
     SELECT 
        others_exp.tr_date,
       others_exp.other_expe_id,
       others_exp.station_id,
       branch.branch_name,
+      expense_item.exp_id,
       expense_item.expense_name,
       others_exp.amount,
       others_exp.remarks,
@@ -48,7 +47,7 @@ function getAllOtherExpensebystationDate(station_id,tr_date, callback) {
     WHERE others_exp.station_id = ? AND others_exp.tr_date=?
   `;
 
-  db.query(query, [station_id,tr_date], (err, results) => {
+  db.query(query, [station_id, tr_date], (err, results) => {
     if (err) {
       callback(err, null);
     } else {
@@ -57,8 +56,7 @@ function getAllOtherExpensebystationDate(station_id,tr_date, callback) {
   });
 }
 
-
-function getOthersSingleExpense(other_expe_id , callback) {
+function getOthersSingleExpense(other_expe_id, callback) {
   const query = `
      SELECT 
        others_exp.tr_date,
@@ -85,10 +83,15 @@ function getOthersSingleExpense(other_expe_id , callback) {
   });
 }
 
-
-
 const updateSingleExpense = (data, callback) => {
-  const { other_expe_id, station_id, other_expitem_id, amount, remarks, tr_date } = data;
+  const {
+    other_expe_id,
+    station_id,
+    other_expitem_id,
+    amount,
+    remarks,
+    tr_date,
+  } = data;
 
   const query = `
     UPDATE others_exp 
@@ -102,7 +105,14 @@ const updateSingleExpense = (data, callback) => {
     WHERE other_expe_id = ?
   `;
 
-  const values = [station_id, other_expitem_id, amount, remarks, tr_date, other_expe_id];
+  const values = [
+    station_id,
+    other_expitem_id,
+    amount,
+    remarks,
+    tr_date,
+    other_expe_id,
+  ];
 
   db.query(query, values, (err, result) => {
     if (err) {
@@ -118,5 +128,5 @@ module.exports = {
   getTotalExpenseByStation,
   getAllOtherExpensebystationDate,
   getOthersSingleExpense,
-  updateSingleExpense
+  updateSingleExpense,
 };

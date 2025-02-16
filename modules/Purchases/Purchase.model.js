@@ -1,8 +1,6 @@
 const db = require("../../config/db.js");
 const dotenv = require("dotenv");
 
-
-
 const getStationwiseLedger = (from_date, to_date, station_id, callback) => {
   const query = `SELECT
     pr.tr_date,
@@ -53,11 +51,15 @@ const getSupplierwiseLedger = (from_date, to_date, supplier_id, callback) => {
 
 const getTotalPurchaseByStation = (station_id, tr_date, callback) => {
   const query = `SELECT
+   pr.id,
+    pr.tr_date,
     pr.fuel_type,
     SUM(pr.total_qty) AS total_quantity,
     SUM(pr.total_amt) AS total_amount,
     SUM(pr.no_truck) AS total_trucks,
+    b.branch_id,
     b.branch_name,
+    s.supplier_id,
     s.supplier_name
     FROM purchase_rate pr
     LEFT JOIN branch b ON pr.station_id = b.branch_id
@@ -117,9 +119,10 @@ function updatePurchase(id, data, callback) {
     Object.keys(data)
       .map((key) => `${key} = ?`)
       .join(", ") +
-    " WHERE id = ?";
+    ", updated_date = NOW() WHERE id = ?";
+
   const updateValues = [...Object.values(data), id];
-  // console.log("User Service", updateQuery, updateValues);
+
   db.query(updateQuery, updateValues, (err, rows) => {
     if (err) {
       callback(err, null);
@@ -135,5 +138,5 @@ module.exports = {
   updatePurchase,
   getTotalPurchaseByStation,
   getSupplierwiseLedger,
-  getStationwiseLedger
+  getStationwiseLedger,
 };
