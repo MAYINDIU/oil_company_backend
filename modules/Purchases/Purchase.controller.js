@@ -213,140 +213,80 @@ const getLedgerReport = (req, res) => {
         console.error("Database Error:", err);
         return res.status(500).json({ error: "Failed to fetch ledger report" });
       }
-      purchaserateModel.getSupplierwiseLedger(
-        from_date,
-        to_date,
-        supplier_id,
-        (err, result) => {
-          if (err) {
-            console.error("Database Error:", err);
-            return res
-              .status(500)
-              .json({ error: "Failed to fetch ledger report" });
-          }
 
-          // Process the result to group and aggregate the data by tr_date
-          const processedData = result.reduce((acc, row) => {
-            const {
-              tr_date,
-              fuel_type,
-              total_qty,
-              total_amt,
-              supplier_name,
-              station_name,
-            } = row;
-            // Process the result to group and aggregate the data by tr_date
-            const processedData = result.reduce((acc, row) => {
-              const {
-                tr_date,
-                fuel_type,
-                total_qty,
-                total_amt,
-                supplier_name,
-                station_name,
-              } = row;
+      // Process the result to group and aggregate the data by tr_date
+      const processedData = result?.reduce((acc, row) => {
+        const {
+          tr_date,
+          fuel_type,
+          total_qty,
+          total_amt,
+          supplier_name,
+          station_name,
+        } = row;
 
-              // Ensure tr_date is handled correctly in UTC by creating a UTC date object
-              const dateObj = new Date(tr_date);
+        // Ensure tr_date is handled correctly in UTC by creating a UTC date object
+        const dateObj = new Date(tr_date);
 
-              // Add 1 day to the date
-              dateObj.setDate(dateObj.getDate() + 1);
-              // Add 1 day to the date
-              dateObj.setDate(dateObj.getDate() + 1);
+        // Add 1 day to the date
+        dateObj.setDate(dateObj.getDate() + 1);
 
-              // Manually format the date as 'DD-MM-YYYY'
-              const day = String(dateObj.getUTCDate()).padStart(2, "0"); // Ensure 2-digit day
-              const month = String(dateObj.getUTCMonth() + 1).padStart(2, "0"); // Ensure 2-digit month
-              const year = dateObj.getUTCFullYear();
+        // Manually format the date as 'DD-MM-YYYY'
+        const day = String(dateObj.getUTCDate()).padStart(2, "0"); // Ensure 2-digit day
+        const month = String(dateObj.getUTCMonth() + 1).padStart(2, "0"); // Ensure 2-digit month
+        const year = dateObj.getUTCFullYear();
 
-              const dateKey = `${day}-${month}-${year}`; // Format as 'DD-MM-YYYY'
+        // ✅ Corrected template literal usage
+        const dateKey = `${day}-${month}-${year}`; // Format as 'DD-MM-YYYY'
 
-              // If the date is not yet in the accumulator, initialize it
-              if (!acc[dateKey]) {
-                acc[dateKey] = {
-                  date: dateKey,
-                  supplier_name,
-                  station_name, // Add the supplier_name here
-                  qty91: 0,
-                  amount91: 0,
-                  qty95: 0,
-                  amount95: 0,
-                  qtyDiesel: 0,
-                  amountDiesel: 0,
-                  totalAmount: 0,
-                };
-              }
-              // If the date is not yet in the accumulator, initialize it
-              if (!acc[dateKey]) {
-                acc[dateKey] = {
-                  date: dateKey,
-                  supplier_name,
-                  station_name, // Add the supplier_name here
-                  qty91: 0,
-                  amount91: 0,
-                  qty95: 0,
-                  amount95: 0,
-                  qtyDiesel: 0,
-                  amountDiesel: 0,
-                  totalAmount: 0,
-                };
-              }
-
-              // Aggregate the data by fuel type
-              switch (fuel_type) {
-                case "91":
-                  acc[dateKey].qty91 += total_qty;
-                  acc[dateKey].amount91 += total_amt;
-                  break;
-                case "95":
-                  acc[dateKey].qty95 += total_qty;
-                  acc[dateKey].amount95 += total_amt;
-                  break;
-                case "Diesel":
-                  acc[dateKey].qtyDiesel += total_qty;
-                  acc[dateKey].amountDiesel += total_amt;
-                  break;
-                default:
-                  break;
-              }
-              // Aggregate the data by fuel type
-              switch (fuel_type) {
-                case "91":
-                  acc[dateKey].qty91 += total_qty;
-                  acc[dateKey].amount91 += total_amt;
-                  break;
-                case "95":
-                  acc[dateKey].qty95 += total_qty;
-                  acc[dateKey].amount95 += total_amt;
-                  break;
-                case "Diesel":
-                  acc[dateKey].qtyDiesel += total_qty;
-                  acc[dateKey].amountDiesel += total_amt;
-                  break;
-                default:
-                  break;
-              }
-
-              // Aggregate total amount
-              acc[dateKey].totalAmount += total_amt;
-              // Aggregate total amount
-              acc[dateKey].totalAmount += total_amt;
-
-              return acc;
-            }, {});
-            return acc;
-          }, {});
-
-          // Convert the object into an array
-          const resultArray = Object.values(processedData);
-
-          // Send the processed result as the response
-          res.status(200).json({
-            success: true,
-            data: resultArray,
-          });
+        // If the date is not yet in the accumulator, initialize it
+        if (!acc[dateKey]) {
+          acc[dateKey] = {
+            date: dateKey,
+            supplier_name,
+            station_name, // Add the station_name here
+            qty91: 0,
+            amount91: 0,
+            qty95: 0,
+            amount95: 0,
+            qtyDiesel: 0,
+            amountDiesel: 0,
+            totalAmount: 0,
+          };
         }
-      );
+
+        // Aggregate the data by fuel type
+        switch (fuel_type) {
+          case "91":
+            acc[dateKey].qty91 += total_qty;
+            acc[dateKey].amount91 += total_amt;
+            break;
+          case "95":
+            acc[dateKey].qty95 += total_qty;
+            acc[dateKey].amount95 += total_amt;
+            break;
+          case "Diesel":
+            acc[dateKey].qtyDiesel += total_qty;
+            acc[dateKey].amountDiesel += total_amt;
+            break;
+          default:
+            break;
+        }
+
+        // Aggregate total amount
+        acc[dateKey].totalAmount += total_amt;
+
+        return acc;
+      }, {});
+
+      // Convert the object into an array
+      const resultArray = Object.values(processedData);
+
+      // Send the processed result as the response
+      res.status(200).json({
+        success: true,
+        data: resultArray,
+      });
     }
   );
 };
@@ -360,9 +300,10 @@ const getTotalExpensebystation = (req, res) => {
 
     (err, result) => {
       if (err) {
-        return res
-          .status(500)
-          .json({ error: "Failed to fetch total purchase" });
+        return res.status(500).json({
+          error: "Failed to fetch total purchase",
+          error: err?.sqlMessage,
+        });
       }
       res.status(201).json({
         success: true,
