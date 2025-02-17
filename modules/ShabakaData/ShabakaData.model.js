@@ -19,6 +19,8 @@ exports.getAll = (station, fromDate, toDate, callback) => {
           s.station_id,
           s.shabaka_id,
           s.amount,
+          s.pos_amt,
+          s.bank_amt,
           s.remarks,
           s.created_at,
           br.branch_name,
