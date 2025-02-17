@@ -51,26 +51,26 @@ const getSupplierwiseLedger = (from_date, to_date, supplier_id, callback) => {
 
 const getTotalPurchaseByStation = (station_id, tr_date, callback) => {
   const query = `SELECT
-   pr.id,
+    MAX(pr.id) AS id, 
     pr.tr_date,
     pr.fuel_type,
     SUM(pr.total_qty) AS total_quantity,
     SUM(pr.total_amt) AS total_amount,
     SUM(pr.no_truck) AS total_trucks,
-    b.branch_id,
-    b.branch_name,
-    s.supplier_id,
-    s.supplier_name
-    FROM purchase_rate pr
-    LEFT JOIN branch b ON pr.station_id = b.branch_id
-    LEFT JOIN suppliers s ON pr.supplier_id = s.supplier_id
-    WHERE
-        pr.station_id = ?  
-        AND pr.tr_date = ?  
-    GROUP BY 
-        pr.fuel_type, b.branch_name, pr.station_id, s.supplier_name
-    ORDER BY 
-        pr.fuel_type`;
+    MAX(b.branch_id) AS branch_id,
+    MAX(b.branch_name) AS branch_name,
+    MAX(s.supplier_id) AS supplier_id,
+    MAX(s.supplier_name) AS supplier_name
+FROM purchase_rate pr
+LEFT JOIN branch b ON pr.station_id = b.branch_id
+LEFT JOIN suppliers s ON pr.supplier_id = s.supplier_id
+WHERE
+    pr.station_id = ?  
+    AND pr.tr_date = ?  
+GROUP BY 
+    pr.fuel_type, pr.tr_date
+ORDER BY 
+    pr.fuel_type`;
 
   db.query(query, [station_id, tr_date], (err, result) => {
     if (err) {
@@ -141,6 +141,31 @@ module.exports = {
   getStationwiseLedger,
 };
 
+// 1. getTotalPurchaseByStation
+// const query = `SELECT
+//    pr.id,
+//     pr.tr_date,
+//     pr.fuel_type,
+//     SUM(pr.total_qty) AS total_quantity,
+//     SUM(pr.total_amt) AS total_amount,
+//     SUM(pr.no_truck) AS total_trucks,
+//     b.branch_id,
+//     b.branch_name,
+//     s.supplier_id,
+//     s.supplier_name
+//     FROM purchase_rate pr
+//     LEFT JOIN branch b ON pr.station_id = b.branch_id
+//     LEFT JOIN suppliers s ON pr.supplier_id = s.supplier_id
+//     WHERE
+//         pr.station_id = ?
+//         AND pr.tr_date = ?
+//     GROUP BY
+//         pr.fuel_type, b.branch_name, pr.station_id, s.supplier_name
+//     ORDER BY
+//         pr.fuel_type`;
+
+
+// 2. getSupplierwiseLedger
 // const query = `SELECT
 // pr.tr_date,
 // pr.fuel_type,
