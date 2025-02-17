@@ -39,16 +39,15 @@ function createMasterSummaryDatacheck(mDetail, callback) {
   );
 }
 
-const getLatestPreviousStock = (station_id, callback) => {
-  const query = `
-    SELECT previous_patrol_95, previous_patrol_91, previous_diesel,available_cash
-    FROM master_summary
-    WHERE station_id = ?
-    ORDER BY STR_TO_DATE(tr_date, '%Y-%m-%d') DESC
-    LIMIT 1;
+const getLatestPreviousStock = (station_id,tr_date, callback) => {
+  const query = `SELECT previous_patrol_95, previous_patrol_91, previous_diesel, available_cash
+FROM master_summary
+WHERE station_id = ?
+AND tr_date = DATE_SUB(?, INTERVAL 1 DAY)
+LIMIT 1
   `;
 
-  db.query(query, [station_id], (err, results) => {
+  db.query(query, [station_id,tr_date], (err, results) => {
     if (err) {
       return callback(err, null);
     }
@@ -89,6 +88,14 @@ const getFuelSummary = async (stationId, fromDate, toDate) => {
   COALESCE(MAX(master_summary.t_sale_diesel), 0) AS t_sale_diesel,
   COALESCE(MAX(master_summary.sheet_extra_diesel), 0) AS sheet_extra_diesel,
   COALESCE(MAX(master_summary.cal_extra_diesel), 0) AS cal_extra_diesel,
+  
+   COALESCE(MAX(master_summary.previous_patrol_95+master_summary.add_patrol_95+master_summary.extra_purchase_95-  t_sale_95+cal_extra_95), 0) AS closing_blnc_actual_95,
+   
+   COALESCE(MAX(master_summary.previous_patrol_91+master_summary.add_patrol_91+master_summary.extra_purchase_91-  t_sale_91+cal_extra_91), 0) AS closing_blnc_actual_91,
+   
+      COALESCE(MAX(master_summary.previous_diesel+master_summary.add_diesel+master_summary.extra_purchase_diesel-  t_sale_diesel+cal_extra_diesel), 0) AS closing_blnc_actual_disel,
+  
+  
 
   COALESCE(SUM(CASE WHEN purchase_rate.fuel_type = '91' THEN purchase_rate.total_qty ELSE 0 END), 0) AS total_qty_91,
   COALESCE(SUM(CASE WHEN purchase_rate.fuel_type = '95' THEN purchase_rate.total_qty ELSE 0 END), 0) AS total_qty_95,

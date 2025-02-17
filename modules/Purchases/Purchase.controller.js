@@ -12,12 +12,10 @@ const getStationwiseLedgerreport = (req, res) => {
     (err, result) => {
       if (err) {
         console.error("Database Error:", err);
-        return res
-          .status(500)
-          .json({
-            error: "Failed to fetch ledger report",
-            error: err?.sqlMessage,
-          });
+        return res.status(500).json({
+          error: "Failed to fetch ledger report",
+          error: err?.sqlMessage,
+        });
       }
 
       // Process the result to group and aggregate the data by tr_date
@@ -26,6 +24,7 @@ const getStationwiseLedgerreport = (req, res) => {
 
         // Ensure tr_date is handled correctly in UTC by creating a UTC date object
         const dateObj = new Date(tr_date);
+        // Ensure tr_date is handled correctly in UTC by creating a UTC date object
 
         // Add 1 day to the date
         dateObj.setDate(dateObj.getDate() + 1);
@@ -144,7 +143,7 @@ const getLedgerReport = (req, res) => {
       }
 
       // Process the result to group and aggregate the data by tr_date
-      const processedData = result.reduce((acc, row) => {
+      const processedData = result?.reduce((acc, row) => {
         const {
           tr_date,
           fuel_type,
@@ -165,6 +164,7 @@ const getLedgerReport = (req, res) => {
         const month = String(dateObj.getUTCMonth() + 1).padStart(2, "0"); // Ensure 2-digit month
         const year = dateObj.getUTCFullYear();
 
+        // ✅ Corrected template literal usage
         const dateKey = `${day}-${month}-${year}`; // Format as 'DD-MM-YYYY'
 
         // If the date is not yet in the accumulator, initialize it
@@ -172,7 +172,7 @@ const getLedgerReport = (req, res) => {
           acc[dateKey] = {
             date: dateKey,
             supplier_name,
-            station_name, // Add the supplier_name here
+            station_name, // Add the station_name here
             qty91: 0,
             amount91: 0,
             qty95: 0,
@@ -228,9 +228,10 @@ const getTotalExpensebystation = (req, res) => {
 
     (err, result) => {
       if (err) {
-        return res
-          .status(500)
-          .json({ error: "Failed to fetch total purchase" });
+        return res.status(500).json({
+          error: "Failed to fetch total purchase",
+          error: err?.sqlMessage,
+        });
       }
       res.status(201).json({
         success: true,
@@ -312,7 +313,7 @@ const updatePurchase = async (req, res) => {
       throw new ApiError(500, err.message);
     } else {
       sendResponse(res, {
-        statusCode: 200,
+        statusCode: 201,
         success: true,
         message: "Purchase updated successfully",
         data: user,
@@ -327,5 +328,6 @@ module.exports = {
   updatePurchase,
   getTotalExpensebystation,
   getLedgerReport,
+  getStationwiseLedgerreport,
   getStationwiseLedgerreport,
 };

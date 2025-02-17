@@ -68,7 +68,6 @@ function getAllSupplier(req, res) {
 
 const updateSupplier = async (req, res) => {
   const { supplier_id } = req.params;
-  console.log(supplier_id);
   const { ...data } = req.body;
   // console.log(id, data);
   supplierModel.updateSupplier(supplier_id, data, (err, user) => {
