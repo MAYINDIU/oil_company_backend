@@ -311,7 +311,6 @@ const updateMasterSingleDetail = async (req, res) => {
 
 const MDetailBackupDelete = (req, res) => {
   const { id } = req.params;
-  console.log(id);
 
   // Call the service to get previous reading
   masterModel.MdetailbackupAndDelete(id, (err, result) => {

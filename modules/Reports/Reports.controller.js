@@ -15,6 +15,7 @@ const getSummaryData = (req, res) => {
     station_id,
     tr_date,
     (err, results) => {
+      console.log(results)
       if (err) {
         console.error("Database error:", err);
         return res.status(500).json({ error: "Internal Server Error" });
@@ -46,6 +47,7 @@ const getSummaryData = (req, res) => {
         extra_purchase_95: results[0].extra_purchase_95,
         sheet_extra_95: results[0].sheet_extra_95,
         cal_extra_95: results[0].cal_extra_95,
+        adjustment_95: results[0].adjustment_95,
         total_stock_95: results[0].total_stock_95,
         // 91 Petrol
         unit_price_91: results[0].unit_price_91,
@@ -56,6 +58,7 @@ const getSummaryData = (req, res) => {
         extra_purchase_91: results[0].extra_purchase_91,
         sheet_extra_91: results[0].sheet_extra_91,
         cal_extra_91: results[0].cal_extra_91,
+        adjustment_91: results[0].adjustment_91,
         total_stock_91: results[0].total_stock_91,
         // Diesel
         unit_price_diesel: results[0].unit_price_diesel,
@@ -66,6 +69,7 @@ const getSummaryData = (req, res) => {
         extra_purchase_diesel: results[0].extra_purchase_diesel,
         sheet_extra_diesel: results[0].sheet_extra_diesel,
         cal_extra_diesel: results[0].cal_extra_diesel,
+        adjustment_diesel: results[0].adjustment_diesel,
         total_stock_diesel: results[0].total_stock_diesel,
         cash_sent_ho: results[0].cash_sent_ho,
         previous_cash: results[0].previous_cash,
