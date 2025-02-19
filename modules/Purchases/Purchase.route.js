@@ -27,4 +27,8 @@ router.get(
   "/stationwise-purchase/:station_id/:tr_date",
   purchaserateController.getStationwisepurchase
 );
+router.delete(
+  "/delete-purchase-rate/:id",
+  purchaserateController.deletePurchaseRate
+);
 module.exports = router;
