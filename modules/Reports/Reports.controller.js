@@ -15,7 +15,6 @@ const getSummaryData = (req, res) => {
     station_id,
     tr_date,
     (err, results) => {
-      console.log(results)
       if (err) {
         console.error("Database error:", err);
         return res.status(500).json({ error: "Internal Server Error" });
@@ -24,7 +23,6 @@ const getSummaryData = (req, res) => {
       if (results.length === 0) {
         return res.status(201).json({ message: "No data found" });
       }
-
 
       // Extract all summary data
       const summaryData = {
@@ -112,6 +110,63 @@ const getSummaryData = (req, res) => {
   );
 };
 
+const getDailyReport = (req, res) => {
+  const { tr_date } = req.query;
+
+  if (!tr_date) {
+    return res.status(400).json({ error: "Date is required" });
+  }
+
+  Promise.all([
+    new Promise((resolve, reject) => {
+      mastersummaryreportModel.dailySalesReport(
+        tr_date,
+        (err, salesResults) => {
+          if (err) reject(err);
+          else resolve(salesResults);
+        }
+      );
+    }),
+    new Promise((resolve, reject) => {
+      mastersummaryreportModel.dailyStockReport(
+        tr_date,
+        (err, stockResults) => {
+          if (err) reject(err);
+          else resolve(stockResults);
+        }
+      );
+    }),
+  ])
+    .then(([sales, stock, party]) => {
+      res.json({
+        sales: sales,
+        stock: stock,
+      });
+    })
+    .catch((err) => {
+      console.error("Database error:", err);
+      res.status(500).json({ error: "Internal Server Error" });
+    });
+};
+
+const getDailyParyReport = (req, res) => {
+  const { tr_date } = req.query;
+
+  if (!tr_date) {
+    return res.status(400).json({ error: "Date is required" });
+  }
+
+  mastersummaryreportModel.dailyPartyReport(tr_date, (err, datas) => {
+    if (err) {
+      return res.status(500).json({ error: "Failed to get data" });
+    }
+
+    res.json({ data: datas });
+  });
+};
+
 module.exports = {
   getSummaryData,
+  getDailyParyReport,
+  getDailyReport,
 };

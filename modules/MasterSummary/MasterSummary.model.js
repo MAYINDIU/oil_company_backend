@@ -39,6 +39,35 @@ function createMasterSummaryDatacheck(mDetail, callback) {
   );
 }
 
+const allMasterData = (tr_date, station_id, callback) => {
+  const query = `
+  SELECT 
+    m.id,
+    m.tr_date as date,
+    m.total_stock_95,
+    m.total_stock_91,
+    m.total_stock_diesel,
+    (m.total_stock_95 + m.total_stock_91 + m.total_stock_diesel) AS total_stock,
+    m.station_id,
+    b.branch_name as station
+   FROM master_summary m
+   JOIN branch b ON m.station_id = b.branch_id
+   WHERE 1=1
+   ${tr_date ? "AND m.tr_date = ?" : ""}
+   ${station_id ? "AND m.station_id = ?" : ""}
+   ORDER BY m.tr_date,b.branch_name ASC;
+  `;
+  const params = [];
+  if (tr_date) params.push(tr_date);
+  if (station_id) params.push(station_id);
+  db.query(query, params, (err, results) => {
+    if (err) {
+      return callback(err, null);
+    }
+    callback(null, results);
+  });
+};
+
 const getLatestPreviousStock = (station_id, tr_date, callback) => {
   const query = `SELECT total_stock_91, total_stock_95, total_stock_diesel, available_cash
 FROM master_summary
@@ -250,6 +279,7 @@ const updateMasterSummary = (station_id, tr_date, data, callback) => {
 module.exports = {
   createMasterSummaryDatacheck,
   getLatestPreviousStock,
+  allMasterData,
   getFuelSummary,
   getDatewiseFuelSummary,
   updateMasterSummary,
