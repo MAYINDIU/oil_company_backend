@@ -343,6 +343,25 @@ const updatePurchase = async (req, res) => {
   });
 };
 
+const deletePurchaseRate = (req, res) => {
+  const { id } = req.params; // Get ID from URL
+
+  purchaserateModel.deletePurchaseRates(id, (err, result) => {
+    if (err) {
+      return res.status(500).json({ error: err.message });
+    }
+
+    if (result.affectedRows === 0) {
+      return res.status(204).json({ message: "No record found to delete" });
+    }
+
+    res.json({
+      message: "Record deleted successfully",
+      affectedRows: result.affectedRows,
+    });
+  });
+};
+
 module.exports = {
   createPurchaseRate,
   getAllPurchaseData,
@@ -352,4 +371,5 @@ module.exports = {
   getStationwiseLedgerreport,
   getStationwisepurchase,
   getStationwiseLedgerreport,
+  deletePurchaseRate,
 };

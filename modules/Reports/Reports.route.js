@@ -6,6 +6,7 @@ const router = express.Router();
 // Prefix all routes with '/api'
 router
   .get("/get-summary-data", reportController.getSummaryData)
+  .get("/get-daily-party-report", reportController.getDailyParyReport)
   .get("/daily-report", reportController.getDailyReport);
 
 module.exports = router;
