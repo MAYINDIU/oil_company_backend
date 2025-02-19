@@ -60,21 +60,15 @@ const dailySalesReport = (tr_date, callback) => {
 const dailyStockReport = (tr_date, callback) => {
   const query = `SELECT 
     (ms.previous_patrol_95 + ms.previous_patrol_91 + ms.previous_diesel) AS stock_op_balc,
-
     (ms.add_patrol_95 + ms.add_patrol_91 + ms.add_diesel) AS stock_addition,
-
     (ms.previous_patrol_95 + ms.previous_patrol_91 + ms.previous_diesel +
     ms.add_patrol_95 + ms.add_patrol_91 + ms.add_diesel) AS stock_total,
-
     (ms.t_sale_95 + ms.t_sale_91 + ms.t_sale_diesel) AS stock_sales,
-
     (ms.adjustment_95 + ms.adjustment_91 + ms.adjustment_diesel) AS stock_loss,
-
     ((ms.previous_patrol_95 + ms.previous_patrol_91 + ms.previous_diesel +
     ms.add_patrol_95 + ms.add_patrol_91 + ms.add_diesel) - 
     (ms.t_sale_95 + ms.t_sale_91 + ms.t_sale_diesel +
     ms.adjustment_95 + ms.adjustment_91 + ms.adjustment_diesel)) AS stock_closing,
-
     b.branch_name  
     FROM master_summary ms
     LEFT JOIN branch b ON ms.station_id = b.branch_id  
@@ -91,14 +85,18 @@ const dailyStockReport = (tr_date, callback) => {
 };
 
 const dailyPartyReport = (tr_date, callback) => {
-  const query = `SELECT 
-    SUM(pu.total_amt) as party_purchase, 
-    b.branch_name  
-    FROM purchase_rate pu
-    LEFT JOIN branch b ON pu.station_id = b.branch_id  
-    WHERE pu.tr_date = ?
-    GROUP BY b.branch_id
-    ORDER BY b.branch_name ASC
+  const query = `
+  SELECT 
+    SUM(pu.total_amt) AS purchase_amt,  
+    b.branch_name AS branch_name,
+    s.supplier_name AS supplier,
+    s.supplier_id  
+FROM purchase_rate pu
+LEFT JOIN branch b ON pu.station_id = b.branch_id
+LEFT JOIN suppliers s ON pu.supplier_id = s.supplier_id  
+WHERE pu.tr_date = ?
+GROUP BY b.branch_id, s.supplier_id 
+ORDER BY s.supplier_name,b.branch_id ASC;
   `;
 
   db.query(query, [tr_date], (err, results) => {

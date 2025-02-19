@@ -136,21 +136,11 @@ const getDailyReport = (req, res) => {
         }
       );
     }),
-    new Promise((resolve, reject) => {
-      mastersummaryreportModel.dailyPartyReport(
-        tr_date,
-        (err, partyResults) => {
-          if (err) reject(err);
-          else resolve(partyResults);
-        }
-      );
-    }),
   ])
     .then(([sales, stock, party]) => {
       res.json({
-        sales: sales?.length > 0 ? sales : "No daily sales data found",
-        stock: stock?.length > 0 ? stock : "No daily stock data found",
-        party: party?.length > 0 ? party : "No daily party data found",
+        sales: sales,
+        stock: stock,
       });
     })
     .catch((err) => {
@@ -159,7 +149,24 @@ const getDailyReport = (req, res) => {
     });
 };
 
+const getDailyParyReport = (req, res) => {
+  const { tr_date } = req.query;
+
+  if (!tr_date) {
+    return res.status(400).json({ error: "Date is required" });
+  }
+
+  mastersummaryreportModel.dailyPartyReport(tr_date, (err, datas) => {
+    if (err) {
+      return res.status(500).json({ error: "Failed to get data" });
+    }
+
+    res.json({ data: datas });
+  });
+};
+
 module.exports = {
   getSummaryData,
+  getDailyParyReport,
   getDailyReport,
 };
