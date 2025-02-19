@@ -113,6 +113,33 @@ ORDER BY pr.station_id, b.branch_id,pr.fuel_type`;
   });
 };
 
+const getStationwisePurchaseList = (station_id, tr_date, callback) => {
+  const query = `SELECT 
+      pr.id,
+      pr.tr_date,
+      pr.fuel_type, 
+      pr.no_truck AS total_trucks,
+      pr.total_qty AS total_quantity,
+      pr.total_amt AS total_amount,
+      b.branch_id,
+      s.supplier_id,
+      b.branch_name, 
+      s.supplier_name
+  FROM purchase_rate pr
+  LEFT JOIN branch b ON pr.station_id = b.branch_id
+  LEFT JOIN suppliers s ON pr.supplier_id = s.supplier_id
+  WHERE pr.tr_date = ? 
+  AND pr.station_id = ?`;
+
+  db.query(query, [tr_date, station_id], (err, result) => {
+    if (err) {
+      console.error("Error fetching purchase list:", err);
+      return callback(err, null);
+    }
+    callback(null, result);
+  });
+};
+
 function updatePurchase(id, data, callback) {
   const updateQuery =
     "UPDATE purchase_rate SET " +
@@ -138,6 +165,7 @@ module.exports = {
   updatePurchase,
   getTotalPurchaseByStation,
   getSupplierwiseLedger,
+  getStationwisePurchaseList,
   getStationwiseLedger,
 };
 
@@ -163,7 +191,6 @@ module.exports = {
 //         pr.fuel_type, b.branch_name, pr.station_id, s.supplier_name
 //     ORDER BY
 //         pr.fuel_type`;
-
 
 // 2. getSupplierwiseLedger
 // const query = `SELECT

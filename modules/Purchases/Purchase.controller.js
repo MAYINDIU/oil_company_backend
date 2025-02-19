@@ -256,6 +256,27 @@ function getAllPurchaseData(req, res) {
   });
 }
 
+const getStationwisepurchase = (req, res) => {
+  const { station_id, tr_date } = req.params; // Get the station_id from the request parameters
+  purchaserateModel.getStationwisePurchaseList(
+    station_id,
+    tr_date,
+
+    (err, result) => {
+      if (err) {
+        return res.status(500).json({
+          error: "Failed to fetch total purchase",
+          error: err?.sqlMessage,
+        });
+      }
+      res.status(201).json({
+        success: true,
+        data: result,
+      });
+    }
+  );
+};
+
 const createPurchaseRate = async (req, res) => {
   try {
     const {
@@ -329,5 +350,6 @@ module.exports = {
   getTotalExpensebystation,
   getLedgerReport,
   getStationwiseLedgerreport,
+  getStationwisepurchase,
   getStationwiseLedgerreport,
 };

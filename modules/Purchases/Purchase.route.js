@@ -18,9 +18,13 @@ router.get(
   purchaserateController.getLedgerReport
 );
 
-
 router.get(
   "/station_wise_ledger_report",
   purchaserateController.getStationwiseLedgerreport
+);
+
+router.get(
+  "/stationwise-purchase/:station_id/:tr_date",
+  purchaserateController.getStationwisepurchase
 );
 module.exports = router;

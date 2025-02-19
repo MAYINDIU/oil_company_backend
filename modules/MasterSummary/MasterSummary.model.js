@@ -39,15 +39,16 @@ function createMasterSummaryDatacheck(mDetail, callback) {
   );
 }
 
-const getLatestPreviousStock = (station_id,tr_date, callback) => {
-  const query = `SELECT previous_patrol_95, previous_patrol_91, previous_diesel, available_cash
+const getLatestPreviousStock = (station_id, tr_date, callback) => {
+  const query = `SELECT total_stock_91, total_stock_95, total_stock_diesel, available_cash
 FROM master_summary
 WHERE station_id = ?
 AND tr_date = DATE_SUB(?, INTERVAL 1 DAY)
 LIMIT 1
+
   `;
 
-  db.query(query, [station_id,tr_date], (err, results) => {
+  db.query(query, [station_id, tr_date], (err, results) => {
     if (err) {
       return callback(err, null);
     }
