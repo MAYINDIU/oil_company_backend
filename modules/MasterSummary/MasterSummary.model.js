@@ -228,11 +228,31 @@ const getDatewiseFuelSummary = async (fromDate, toDate) => {
   });
 };
 
+const updateMasterSummary = (station_id, tr_date, data, callback) => {
+  const updateQuery =
+    "UPDATE master_summary SET " +
+    Object.keys(data)
+      .map((key) => `${key} = ?`) // ✅ Corrected string interpolation
+      .join(", ") +
+    " WHERE station_id = ? AND tr_date = ?";
+
+  const updateValues = [...Object.values(data), station_id, tr_date];
+
+  db.query(updateQuery, updateValues, (err, result) => {
+    if (err) {
+      callback(err, null);
+      return;
+    }
+    callback(null, result);
+  });
+};
+
 module.exports = {
   createMasterSummaryDatacheck,
   getLatestPreviousStock,
   getFuelSummary,
   getDatewiseFuelSummary,
+  updateMasterSummary,
 };
 
 // SELECT
