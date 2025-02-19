@@ -96,7 +96,7 @@ LEFT JOIN branch b ON pu.station_id = b.branch_id
 LEFT JOIN suppliers s ON pu.supplier_id = s.supplier_id  
 WHERE pu.tr_date = ?
 GROUP BY b.branch_id, s.supplier_id 
-ORDER BY s.supplier_name,b.branch_id ASC;
+ORDER BY s.supplier_name,b.branch_name ASC;
   `;
 
   db.query(query, [tr_date], (err, results) => {

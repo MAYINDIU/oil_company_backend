@@ -48,6 +48,17 @@ const createMasterSummary = async (req, res) => {
   });
 };
 
+const getAllMasterData = (req, res) => {
+  const {tr_date, station_id } = req.query;
+  mastersummaryModel.allMasterData(tr_date, station_id, (err, datas) => {
+    if (err) {
+      return res.status(500).json({ error: "Failed to get data" });
+    }
+
+    res.json({ data: datas });
+  });
+};
+
 const getPreviousStk = (req, res) => {
   const { station_id, tr_date } = req.query;
 
@@ -147,6 +158,7 @@ const updateMasterSummary = (req, res) => {
 module.exports = {
   createMasterSummaryDetail,
   createMasterSummary,
+  getAllMasterData,
   getPreviousStk,
   getFuelSummary,
   getDatewiseFuelSummary,
