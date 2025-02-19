@@ -158,6 +158,17 @@ function updatePurchase(id, data, callback) {
     callback(null, rows);
   });
 }
+const deletePurchaseRates = (id, callback) => {
+  const deleteQuery = "DELETE FROM purchase_rate WHERE id = ?";
+
+  db.query(deleteQuery, [id], (err, result) => {
+    if (err) {
+      callback(err, null);
+      return;
+    }
+    callback(null, result);
+  });
+};
 
 module.exports = {
   createPurchaseRate,
@@ -167,43 +178,5 @@ module.exports = {
   getSupplierwiseLedger,
   getStationwisePurchaseList,
   getStationwiseLedger,
+  deletePurchaseRates,
 };
-
-// 1. getTotalPurchaseByStation
-// const query = `SELECT
-//    pr.id,
-//     pr.tr_date,
-//     pr.fuel_type,
-//     SUM(pr.total_qty) AS total_quantity,
-//     SUM(pr.total_amt) AS total_amount,
-//     SUM(pr.no_truck) AS total_trucks,
-//     b.branch_id,
-//     b.branch_name,
-//     s.supplier_id,
-//     s.supplier_name
-//     FROM purchase_rate pr
-//     LEFT JOIN branch b ON pr.station_id = b.branch_id
-//     LEFT JOIN suppliers s ON pr.supplier_id = s.supplier_id
-//     WHERE
-//         pr.station_id = ?
-//         AND pr.tr_date = ?
-//     GROUP BY
-//         pr.fuel_type, b.branch_name, pr.station_id, s.supplier_name
-//     ORDER BY
-//         pr.fuel_type`;
-
-// 2. getSupplierwiseLedger
-// const query = `SELECT
-// pr.tr_date,
-// pr.fuel_type,
-// SUM(pr.total_qty) AS total_qty,
-// SUM(pr.total_amt) AS total_amt,
-// b.branch_name AS station_name,
-// s.supplier_name
-// FROM purchase_rate pr
-// JOIN branch b ON b.branch_id = pr.station_id
-// JOIN suppliers s ON s.supplier_id = pr.supplier_id
-// WHERE pr.tr_date BETWEEN ? AND ?
-// AND pr.station_id = ?
-// GROUP BY pr.tr_date, pr.fuel_type
-// ORDER BY pr.tr_date, pr.fuel_type`;
