@@ -43,7 +43,7 @@ const allMasterData = (tr_date, station_id, callback) => {
   const query = `
   SELECT 
     m.id,
-    m.tr_date as date,
+    DATE_FORMAT(m.tr_date, '%Y-%m-%d') as date,
     m.total_stock_95,
     m.total_stock_91,
     m.total_stock_diesel,
