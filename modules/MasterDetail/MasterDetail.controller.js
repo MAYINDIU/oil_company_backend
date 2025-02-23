@@ -203,14 +203,14 @@ const getPreviousReadings = (req, res) => {
 };
 
 const getPrevReadingData = (req, res) => {
-  const { station_id, fuel_type, torambo_no, tr_date } = req.query;
+  const { station_id, fuel_type, torambo_no } = req.query;
 
   // Call the service to get previous reading
   masterModel.getPrevReading(
     station_id,
     fuel_type,
     torambo_no,
-    tr_date,
+   
     (err, result) => {
       if (err) {
         return res
