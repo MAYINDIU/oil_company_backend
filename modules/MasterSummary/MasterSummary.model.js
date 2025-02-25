@@ -55,7 +55,7 @@ const allMasterData = (tr_date, station_id, callback) => {
    WHERE 1=1
    ${tr_date ? "AND m.tr_date = ?" : ""}
    ${station_id ? "AND m.station_id = ?" : ""}
-   ORDER BY m.tr_date,b.branch_name ASC;
+   ORDER BY m.tr_date DESC;
   `;
   const params = [];
   if (tr_date) params.push(tr_date);
@@ -75,13 +75,11 @@ const getLatestPreviousStock = (station_id, callback) => {
   //               AND tr_date = DATE_SUB(?, INTERVAL 1 DAY)
   //               LIMIT 1`;
 
- const query = `SELECT total_stock_91, total_stock_95, total_stock_diesel, available_cash,tr_date
+  const query = `SELECT total_stock_91, total_stock_95, total_stock_diesel, available_cash,tr_date
                 FROM master_summary
                 WHERE station_id = ?
                 ORDER BY tr_date DESC
                 LIMIT 1 `;
-
-                     
 
   db.query(query, [station_id], (err, results) => {
     if (err) {
