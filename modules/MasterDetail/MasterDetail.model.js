@@ -185,16 +185,26 @@ const updateMasterDatas = (
 
 
 
-const getPrevReading = (station_id, fuel_type, torambo_no, tr_date, callback) => {
-  const query = `SELECT present_reading as Prv_reading 
-    FROM m_detail
-    WHERE station_id = ? 
-    AND fuel_type = ?
-    AND torambo_no = ?
-    AND tr_date = DATE_SUB(?, INTERVAL 1 DAY)
-    LIMIT 1`;
+const getPrevReading = (station_id, fuel_type, torambo_no, callback) => {
+  // const query = `SELECT present_reading as Prv_reading 
+  //   FROM m_detail
+  //   WHERE station_id = ? 
+  //   AND fuel_type = ?
+  //   AND torambo_no = ?
+  //   AND tr_date = DATE_SUB(?, INTERVAL 1 DAY)
+  //   LIMIT 1`;
 
-  db.query(query, [station_id, fuel_type, torambo_no, tr_date], (err, results) => {
+
+  const query = `SELECT present_reading AS Prv_reading
+FROM m_detail
+WHERE station_id = ?
+  AND fuel_type = ?
+  AND torambo_no = ?
+ORDER BY tr_date DESC
+LIMIT 1`;
+ 
+
+  db.query(query, [station_id, fuel_type, torambo_no], (err, results) => {
     if (err) {
       console.error("Error fetching m_detail data:", err);
       return callback(err, null);

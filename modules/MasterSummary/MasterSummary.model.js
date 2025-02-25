@@ -68,16 +68,22 @@ const allMasterData = (tr_date, station_id, callback) => {
   });
 };
 
-const getLatestPreviousStock = (station_id, tr_date, callback) => {
-  const query = `SELECT total_stock_91, total_stock_95, total_stock_diesel, available_cash
-FROM master_summary
-WHERE station_id = ?
-AND tr_date = DATE_SUB(?, INTERVAL 1 DAY)
-LIMIT 1
+const getLatestPreviousStock = (station_id, callback) => {
+  // const query = `SELECT total_stock_91, total_stock_95, total_stock_diesel, available_cash
+  //               FROM master_summary
+  //               WHERE station_id = ?
+  //               AND tr_date = DATE_SUB(?, INTERVAL 1 DAY)
+  //               LIMIT 1`;
 
-  `;
+ const query = `SELECT total_stock_91, total_stock_95, total_stock_diesel, available_cash,tr_date
+                FROM master_summary
+                WHERE station_id = ?
+                ORDER BY tr_date DESC
+                LIMIT 1 `;
 
-  db.query(query, [station_id, tr_date], (err, results) => {
+                     
+
+  db.query(query, [station_id], (err, results) => {
     if (err) {
       return callback(err, null);
     }
