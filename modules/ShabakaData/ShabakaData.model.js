@@ -21,6 +21,7 @@ exports.getAll = (station, fromDate, toDate, callback) => {
           s.amount,
           s.pos_amt,
           s.bank_amt,
+          s.petroAppDep,
           s.remarks,
           s.created_at,
           br.branch_name,
@@ -71,5 +72,21 @@ exports.delete = (id, callback) => {
       return;
     }
     callback(null, results.affectedRows);
+  });
+};
+
+exports.ShebakaStationReport = (fromDate, toDate, station_id, callback) => {
+  const sql = `
+    SELECT DATE_FORMAT(tr_date, '%d-%m-%Y') AS tr_date, shabaka_payment, petro_app_payment 
+    FROM master_summary 
+    WHERE tr_date BETWEEN ? AND ? 
+    AND station_id = ? ORDER BY tr_date`;
+
+  connection.query(sql, [fromDate, toDate, station_id], (err, results) => {
+    if (err) {
+      callback(err, null);
+      return;
+    }
+    callback(null, results);
   });
 };

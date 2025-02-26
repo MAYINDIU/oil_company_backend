@@ -84,3 +84,24 @@ exports.deleteDataById = (req, res) => {
     res.json({ message: "Data deleted successfully" });
   });
 };
+
+exports.getShebakaStationReport = (req, res) => {
+  const { fromDate, toDate, station_id } = req.query;
+
+  // Validate required parameters
+  if (!fromDate || !toDate || !station_id) {
+    return res.status(400).json({ error: 'Missing required parameters' });
+  }
+
+  shabakaDataModel.ShebakaStationReport(fromDate, toDate, station_id, (err, results) => {
+    if (err) {
+      return res.status(500).json({ error: 'Database query error', details: err.message });
+    }
+
+    if (results.length === 0) {
+      return res.status(204).json({ message: 'No records found' });
+    }
+
+    res.status(200).json(results);
+  });
+};
