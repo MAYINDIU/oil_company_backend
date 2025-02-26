@@ -28,6 +28,9 @@ router
     "/shabaka_data_delete/:id",
     authMiddleware(["admin"]),
     shabakaDataController.deleteDataById
-  );
+  )
+
+  .get("/shebaka-station-wise-report", shabakaDataController.getShebakaStationReport);
+
 
 module.exports = router;

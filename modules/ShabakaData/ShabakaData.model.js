@@ -73,3 +73,20 @@ exports.delete = (id, callback) => {
     callback(null, results.affectedRows);
   });
 };
+
+
+exports.ShebakaStationReport = (fromDate, toDate, station_id, callback) => {
+  const sql = `
+    SELECT tr_date, shabaka_payment, petro_app_payment 
+    FROM master_summary 
+    WHERE tr_date BETWEEN ? AND ? 
+    AND station_id = ?`;
+
+  connection.query(sql, [fromDate, toDate, station_id], (err, results) => {
+    if (err) {
+      callback(err, null);
+      return;
+    }
+    callback(null, results);
+  });
+};
