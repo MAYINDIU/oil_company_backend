@@ -26,8 +26,8 @@ exports.createData = (req, res) => {
 };
 
 exports.getAllData = async (req, res) => {
-  const { station } = req.query;
-  shabakaModel.getAll(station, (err, datas) => {
+  const { station,shabaka_no } = req.query;
+  shabakaModel.getAll(station,shabaka_no, (err, datas) => {
     if (err) {
       return res.status(500).json({ error: "Failed to get data" });
     }

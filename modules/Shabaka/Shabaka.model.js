@@ -22,7 +22,7 @@ exports.create = (newUser, callback) => {
 //   });
 // };
 
-exports.getAll = (station, callback) => {
+exports.getAll = (station,shabaka_no, callback) => {
   const query = `
       SELECT 
           s.id,
@@ -38,11 +38,13 @@ exports.getAll = (station, callback) => {
       JOIN banklist b ON s.bank_name = b.id
       WHERE 1=1
       ${station ? "AND s.station_id = ?" : ""}
+      ${shabaka_no ? "AND s.shabaka_no = ?" : ""}
       ORDER BY br.branch_name, s.shabaka_no ASC
   `;
 
   const params = [];
   if (station) params.push(station);
+  if (shabaka_no) params.push(shabaka_no);
 
   connection.query(query, params, (err, results) => {
     if (err) {
